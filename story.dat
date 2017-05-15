@@ -1,0 +1,299 @@
+/****************************Example FILE****************/
+Search
+
+    CXO Cloud Big Data Security Innovation More
+        Newsletters Forums Resource Library Tech Pro Free Trial 
+
+Open Source
+Securely delete files with shred
+
+If you want to delete sensitive data and make sure that it can't be recovered, the Linux rm command may not be enough. For deletion and file scrubbing, try the shred command, which overwrites data with gibberish before deleting it.
+
+By Vincent Danen | in Linux and Open Source, March 31, 2008, 2:43 AM PST
+
+    12
+
+There are two utilities on a typical Linux box that can be used to delete files. Most users are familiar with the rm command. Most of the time, this command is sufficient for routine deletion, but for files that contain sensitive data, you might need to scrub them so that they cannot be recovered later with other data retrieval tools.
+
+To delete files with sensitive content, rm is not sufficient. Instead, consider using the shred command, which not only deletes a file, but deletes it in such a way that it cannot be recovered. Shred overwrites the file multiple times with garbage prior to deleting it, ensuring that if anything does get retrieved, it isn't your top-secret data.
+
+For instance:
+
+$ echo "this is private data" >private.txt
+
+$ cat private.txt
+
+this is private data
+
+$ ls -l private.txt
+
+-rw-r—r— 1 vdanen vdanen 21 Mar  4 09:36 private.txt
+
+To illustrate how shred works, call it without any command-line options so that the garbage in the file can be viewed:
+
+$ shred private.txt
+
+$ cat private.txt
+
+?9?-?w?K?=???l;b8SƉ?b???????@,?18!??DM??P?
+
+...
+
+$ ls -l private.txt
+
+-rw-r—r— 1 vdanen vdanen 4096 Mar  4 09:36 private.txt
+
+The rest of the output is removed as it is binary gibberish. You can also see the file size has changed.
+ADVERTISING
+inRead invented by Teads
+ADVERTISING
+inRead invented by Teads
+
+To delete the file after overwriting it with garbage, use the -u option. To see what shred is actually doing, give it the verbose -v option:
+
+$ shred -u -v private.txt
+
+shred: private.txt: pass 1/25 (random)...
+
+shred: private.txt: pass 2/25 (cccccc)...
+
+shred: private.txt: pass 3/25 (111111)...
+
+shred: private.txt: pass 4/25 (000000)...
+
+shred: private.txt: pass 5/25 (999999)...
+
+shred: private.txt: pass 6/25 (aaaaaa)...
+
+shred: private.txt: pass 7/25 (924924)...
+
+shred: private.txt: pass 8/25 (b6db6d)...
+
+shred: private.txt: pass 9/25 (6db6db)...
+
+shred: private.txt: pass 10/25 (888888)...
+
+shred: private.txt: pass 11/25 (492492)...
+
+shred: private.txt: pass 12/25 (db6db6)...
+
+shred: private.txt: pass 13/25 (random)...
+
+shred: private.txt: pass 14/25 (ffffff)...
+
+shred: private.txt: pass 15/25 (bbbbbb)...
+
+shred: private.txt: pass 16/25 (777777)...
+
+shred: private.txt: pass 17/25 (444444)...
+
+shred: private.txt: pass 18/25 (dddddd)...
+
+shred: private.txt: pass 19/25 (333333)...
+
+shred: private.txt: pass 20/25 (555555)...
+
+shred: private.txt: pass 21/25 (222222)...
+
+shred: private.txt: pass 22/25 (eeeeee)...
+
+shred: private.txt: pass 23/25 (666666)...
+
+shred: private.txt: pass 24/25 (249249)...
+
+shred: private.txt: pass 25/25 (random)...
+
+shred: private.txt: removing
+
+shred: private.txt: renamed to 00000000000
+
+shred: 00000000000: renamed to 0000000000
+
+shred: 0000000000: renamed to 000000000
+
+shred: 000000000: renamed to 00000000
+
+shred: 00000000: renamed to 0000000
+
+shred: 0000000: renamed to 000000
+
+shred: 000000: renamed to 00000
+
+shred: 00000: renamed to 0000
+
+shred: 0000: renamed to 000
+
+shred: 000: renamed to 00
+
+shred: 00: renamed to 0
+
+shred: private.txt: removed
+
+As you can see, shred overwrites the file 25 times with garbage. After this, it renames the file 11 times before deleting it.
+
+Shred can also be used to overwrite entire disks instead of just files. If you wished to overwrite the contents of an entire hard drive, a process which would definitely take a fair amount of time, use:
+
+# shred -u -n 30 /dev/hda
+
+Live Webcast - Digitize Your Business: Defining Your E-Signature Requirements
+
+Efforts by organizations of all sizes and across multiple industries to digitize transactional processes continue to drive the e-signature market. According to Forrester Research* e-signature transactions are becoming more widespread because smartphones, tablets, and touchscreen computers have made them simpler, more accessible, and cheaper*. But with the numerous e-signature providers in the market, making the right choice - for today and tomorrow - can be overwhelming.
+
+Join eSignLive and guest speaker Craig Le Clair from Forrester Research to learn about the driving forces behind e-signature adoption, both locally and abroad, and how to define your requirements. This 60-minute presentation will address:
+
+    The integrated components of a digital business
+    What's driving e-signature adoption in regulated industries
+    B2E, B2B and B2C e-signature use cases
+    Defining key e-signature integration requirements
+    Top e-signature evaluation criteria from your peers
+
+
+Reserve Your Seat Now!
+
+Webcasts provided by eSignLive by VASCO
+
+This will overwrite the data on the drive with garbage using 30 passes. The drive will need to be re-formatted after this as even the filesystem structure will be destroyed.
+
+    12
+
+About Vincent Danen
+
+Vincent Danen works on the Red Hat Security Response Team and lives in Canada. He has been writing about and developing on Linux for over 10 years and is a veteran Mac user.
+
+    Full Bio
+    Contact
+    See all of Vincent's content
+
+  
+by Taboola 
+Promoted Links 
+Recommended
+Most Dangerous Dog Breeds in the WorldPressRoomVIP
+Truly Amazing Titanium Ear ProtectorsFlare Audio
+Fashion Bloggers Showcase Brazil's Vibrant Fashion SceneCNN for Be Brazil
+A $6 Linux computer that plays Doom: Could this tiny Chinese clone challenge the Raspberry Pi Zero?
+Raspberry Pi rival: Asus launches Tinker Board, faster, with 2X memory and 4k video
+Classic Windows on a $35 computer: How to fire up Windows 3.1, 95, 98 and XP on your Raspberry Pi
+12 comments
+Log In
+1 person following
+ 
+Please Log In to TechRepublic to Comment
+
+    Commenting FAQs
+    Community Guidelines
+
+Newest | Oldest | Top Comments
+dgs010243
+Apr 4, 2008
+
+The most indicated procedure is to backup regularly the sensitive files and folders. It is mandatory. The second is to have a supplimentary partition with the Windows XP/NT. Sorry! Please avoid to choose the NTFS organization. as consequence you can save files from Linux to a FAT-32 partition. The third and the most important procedure is to have a wireless closed private network, transporting your strategic files to many nodes. Yours faithfully, Dan Gheorghe http://dan.somnea.free.fr/2C/
+Share
+LikeReply
+DanLM
+Apr 2, 2008
+
+Isn't that a shread? From the man page: [i] -P Overwrite regular files before deleting them. Files are overwritten three times, first with the byte pattern 0xff, then 0x00, and then 0xff again, before they are deleted. Specifying this flag for a read only file will cause rm to generate an error message and exit. The file will not be removed or overwritten. [/i] Or is that just Unix???? Dan
+Share
+LikeReply
+apotheon
+Apr 1, 2008
+
+[url=http://blogs.techrepublic.com.com/security/?p=388]I've been using shred for a while, now.[/url]
+Share
+LikeReply
+BALTHOR
+Mar 31, 2008
+
+Is this what the author of Linux had in mind?A lot of typing?
+Share
+LikeReply
+TripleII-21189418044173169409978279405827
+Mar 31, 2008
+
+Shred, from their own man page, CAUTION: Note that shred relies on a very important assumption: that the file system overwrites data in place. This is the traditional way to do things, but many modern file system designs do not satisfy this assumption. ... * log-structured or journaled file systems, such as those supplied with AIX and Solaris (and JFS, ReiserFS, XFS, Ext3, etc.) ... Since the default for Linux is Ext3, or ReiserFS, shred is not actually overwriting on place. Your tool to shred an entire disk using, shred -u -n 30 /dev/hda is a good one, however, format the disk to be EXT2 (non journalised) before you run the command. TripleII
+Share
+LikeReply
+Powered by Livefyre
+Add your Comment
+White Papers, Webcasts, and Downloads
+
+    White Papers // From Nimble Storage
+    Achieving Flash Storage Nirvana
+    Whitepaper
+
+    Whtepaper arguing the reason why flash storage isn't enough to guarantee application performance and why Predictive Analytics is a requirement for critical applications in the context of today's complex infrastructure.
+    Download Now
+
+    Webcasts // From GoTransverse
+    Live Webcast: Take Billing into the 21st Century with Smart Technology
+    Find Out More
+
+    White Papers // From NetApp/SolidFire
+    SolidFire Success Story: Internet Solutions
+    Read More
+
+    Downloads // From SolarWinds
+    Find and Fix IP Conflicts in Two Clicks
+    Download Now
+
+    White Papers // From SolarWinds
+    Calm or Crisis? Network Automation Makes the Difference
+    Download Now
+
+Editor's Picks
+Google Fiber 2.0 targets where it will stage its comeback, as AT&T Fiber prepares to go nuclear
+
+Google Fiber 2.0 targets where it will stage its comeback, as AT&T Fiber prepares to go nuclear
+The truth about MooCs and bootcamps: Their biggest benefit isn't creating more coders
+
+The truth about MooCs and bootcamps: Their biggest benefit isn't creating more coders
+How Mark Shuttleworth became the first African in space and launched a software revolution
+
+How Mark Shuttleworth became the first African in space and launched a software revolution
+Inside Amazon's clickworker platform: How half a million people are paid pennies to train AI
+
+Inside Amazon's clickworker platform: How half a million people are paid pennies to train AI
+  
+by Taboola 
+Sponsored Links 
+RECOMMENDED
+UK focuses on rare disease patient care with new centreHealth Awareness
+The 20 Most Generous Billionaires In The WorldAfriZap
+Latest From Tech Pro Research
+
+Research: DevOps adoption rates, associated hiring and retraining, and outcomes after implementation
+
+Service level agreement (SLA) policy
+
+Employee non-compete agreement policy
+
+BYOD (bring-your-own-device) policy
+Services
+
+    About Us
+    Membership
+    Newsletters
+    RSS Feeds
+    Site Map
+
+    Site Help & Feedback
+    FAQ
+    Advertise
+    Reprint Policy
+
+Explore
+
+    Blogs
+    Downloads
+    TechRepublic Forums
+    Meet the Team
+
+    Tech Pro Research
+    Resource Library
+    Photos
+    Videos
+
+© 2017 CBS Interactive. All rights reserved. Privacy Policy | Cookies | Ad Choice | Terms of Use | Mobile User Agreement
+A ZDNet site | Visit other CBS Interactive sites:
+
