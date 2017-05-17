@@ -29,8 +29,13 @@ public:
     /*May be we should check for std::is_constructible?*/
     template<typename T,
              typename = std::enable_if_t<
-                            !std::is_base_of<Cryptographer,
-                                             std::decay_t<T>
+                            !std::is_base_of<
+                                 Cryptographer,
+                                 std::decay_t<T>
+                             >::value &&
+                             std::is_constructible<
+                                 path,
+                                 std::decay_t<T>
                              >::value
                         >
     >
@@ -45,8 +50,9 @@ public:
 
     template<typename T,
              typename = std::enable_if_t<
-                            std::is_assignable<path,
-                                    std::remove_reference_t<T>
+                            std::is_assignable<
+                                path,
+                                std::decay_t<T>
                             >::value
                         >
     >
@@ -60,8 +66,9 @@ public:
 
     template<typename T,
              typename = std::enable_if_t<
-                            std::is_assignable<path,
-                                std::remove_reference_t<T>
+                            std::is_assignable<
+                                path,
+                                std::decay_t<T>
                             >::value
                         >
     >
@@ -83,8 +90,9 @@ public:
 
     template<typename T,
              typename = std::enable_if_t<
-                            std::is_assignable<path, 
-                                       std::remove_reference_t<T>
+                            std::is_assignable<
+                                path, 
+                                std::decay_t<T>
                             >::value
                         >
     >
@@ -118,11 +126,11 @@ public:
              typename = std::enable_if_t<
                             std::is_assignable<
                                 std::string,
-                                std::remove_reference_t<keyT>
+                                std::decay_t<keyT>
                             >::value
                         >
     >
-    void setKey(keyT&& newKey) noexcept {
+    void setKey(keyT&& newKey) {    // Probably it's not noexcept
         m_encKey = std::forward<keyT>(newKey);
 
         //if()
@@ -143,7 +151,7 @@ public:
              typename = std::enable_if_t<
                             std::is_assignable<
                                 std::string,
-                                std::remove_reference_t<ivT>
+                                std::decay_t<ivT>
                             >::value
                         >
     >

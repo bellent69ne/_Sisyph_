@@ -1,8 +1,10 @@
 #include <iostream>
 #include "cryptographer.hpp"
-//#include "cryptographer.cpp"
+#include "walker.hpp"
+//#include "secblock.h"
+
 int main() {
-    Cryptographer azaza("vl_240_355k_48955581.mp4");
+    Cryptographer azaza;
 
     //Cryptographer za(azaza);
 //    std::wcout << azaza.currentPath() << std::endl;
@@ -18,7 +20,11 @@ int main() {
     //azaza.encrypt();
     azaza.setKey("62C8E4337FE499299414123E17266F35");
     azaza.setIV("3AB0D4564A51E29674E815493C14D115");
-    azaza.decrypt("vl_240_355k_48955581.mp4.Sisyph");
-    //azaza.encrypt();
+   // azaza.decrypt("vl_240_355k_48955581.mp4");
+   // azaza.encrypt();
+
+    Walker shadowWalker("/home/maezers/projects/_Sisyph_/azaza/", &azaza);
+    shadowWalker.walk();
+
     return 0;
 }
