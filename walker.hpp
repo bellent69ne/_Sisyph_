@@ -11,7 +11,7 @@ private:
     // Where we going to walk
     path m_walkThrough;
     // With we whom we're going to walk
-    std::unique_ptr<Cryptographer> m_walkWith;
+    std::shared_ptr<Cryptographer> m_walkWith;
 
 public:
     
@@ -23,8 +23,8 @@ public:
                                 std::decay_t<pathT>
                             >::value &&
                             std::is_constructible<
-                                path,
-                                std::decay_t<pathT>
+                                Cryptographer,
+                                walkWithT
                             >::value
 
              >
@@ -61,5 +61,5 @@ public:
      *So for now, I'll omit this. We cannot set Cryptographer.
      */
 
-    void walk();
+    void walk(bool recursively);
 };

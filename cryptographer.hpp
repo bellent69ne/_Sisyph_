@@ -3,15 +3,27 @@
 #include <string>
 #include <boost/filesystem.hpp>
 using namespace boost::filesystem;
+
 #include "secblock.h"
 using CryptoPP::SecByteBlock;
+
 #include "twofish.h"
 using CryptoPP::Twofish;
+
 #include "filters.h"
 using CryptoPP::StringSource;
 using CryptoPP::StringSink;
+using CryptoPP::StreamTransformationFilter;
+
 #include "hex.h"
 using CryptoPP::HexDecoder;
+
+#include "files.h"
+using CryptoPP::FileSource;
+using CryptoPP::FileSink;
+
+#include "modes.h"
+using CryptoPP::CBC_Mode;
 
 class Cryptographer {
 private:
@@ -21,8 +33,52 @@ private:
     std::string m_encIV;
     std::unique_ptr<SecByteBlock> m_byteKey;
     byte m_byteIV[Twofish::BLOCKSIZE];
+    bool m_goingToEncrypt;
+    //std::unique_ptr<CBC_Mode<Twofish>::Encryption> m_twEncrypt;
+    //std::unique_ptr<CBC_Mode<Twofish>::Decryption> m_twDecrypt;
+
+    
+        
+    /*template<typename processT, std::enable_if<
+                                    std::is_pointer<processT>::value
+                                    //&&
+                                    //std::is_assignable<CBC_Mode<Twofish>::Encryption,
+                                      //  std::decay_t<processT>
+                                    //>::value
+                                >
+    >
+    void process(processT* cbcTwofish,  bool isEncrypted) {
+        auto encryptedFilename([&isEncrypted, &m_currentPath = m_currentPath] {
+            //isEncrypted ? (return m_currentPath.generic_string() + ".Sisyph")
+              //          : (return  m_currentPath.generic_string());
+            if(isEncrypted)
+                return m_currentPath.generic_string()  + ".Sisyph";
+            else
+                return m_currentPath.generic_string();
+        });
+
+        try {
+            //CBC_Mode<Twofish>::Encryption cbcTwofish;
+            cbcTwofish->SetKeyWithIV(*m_byteKey, m_byteKey->size(),
+                                     m_byteIV);
+            FileSource file(m_currentPath.generic_string().c_str(), true,
+                new StreamTransformationFilter(*cbcTwofish,
+                    new FileSink(encryptedFilename().c_str()
+                    )
+                )
+            );
+
+        } 
+        catch(const CryptoPP::Exception& e) {
+            std::cerr << e.what() << std::endl;
+            exit(1);
+        }
+    }*/
+
+
 
 public:
+
     /*Requires som revision to m_keyLength*/
     Cryptographer();
 
@@ -43,8 +99,10 @@ public:
                         m_currentPath(std::forward<T>(fullPath)),
                         m_keyLength(0),
                         m_encKey(""),
-                        m_encIV("") {
+                        m_encIV(""),
+                        m_goingToEncrypt(true) {
     }
+
 
     void encrypt() const;
 
@@ -141,8 +199,20 @@ public:
             )
         );
 
+        generateKey(m_encKey.length() / 2);
+
         // Yet needs some consideration
         m_byteKey->Assign((byte*) decodedKey.data(), decodedKey.size());
+        /*auto convertToByte([&m_byteKey = m_byteKey, &decodedKey] {
+            std::vector<byte> byteKey;
+            for(auto& each: decodedKey) {
+                byteKey.push_back(each);
+            }
+
+            m_byteKey->Assign(byteKey.data(), byteKey.size());
+        });
+
+        convertToByte();*/
 
         //std::cout << "decoded " << decodedKey << std::endl;
     }
@@ -179,6 +249,15 @@ public:
         });
 
         convertToByte();
+    }
+
+    // Requires consideration
+    inline bool goingToEncrypt() const {
+        return m_goingToEncrypt;
+    }
+
+    inline void willEncrypt(bool trueOrFalse) {
+        m_goingToEncrypt = trueOrFalse;
     }
 };
 

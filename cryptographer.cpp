@@ -16,7 +16,6 @@ using CryptoPP::HexDecoder;
 #include "filters.h"
 using CryptoPP::StringSink;
 using CryptoPP::StringSource;
-using CryptoPP::StreamTransformationFilter;
 
 #include "twofish.h"
 using CryptoPP::Twofish;
@@ -27,17 +26,19 @@ using CryptoPP::CBC_Mode;
 #include "secblock.h"
 using CryptoPP::SecByteBlock;
 
-#include "files.h"
-using CryptoPP::FileSource;
-using CryptoPP::FileSink;
+
 /**** Implementation of Encryption method itself *****/
 /**** WRONG!!!!!! ********************************
 ******** SMTH BAD HAPPENS HERE************************/
 Cryptographer::Cryptographer(): m_currentPath(""),
                                 m_keyLength(0),
                                 m_encKey(""),
-                                m_encIV(""){
+                                m_encIV(""), 
+                                m_goingToEncrypt(true) {
 }
+
+
+
 void Cryptographer::encrypt() const {
     if(m_currentPath.extension() == ".Sisyph") {
         std::cerr << "File is already encrypted..." << std::endl;
@@ -62,7 +63,8 @@ void Cryptographer::encrypt() const {
           std::cerr << e.what() << std::endl;
           exit(1);
       }
-
+          /*auto cbc(std::make_unique<CBC_Mode<Twofish>::Encryption>());
+    process(cbc, true);*/
     /*******We should provide our implementation to system's shred*******/
     std::system(("shred -u " + m_currentPath.generic_string()).c_str());
 }
@@ -95,7 +97,7 @@ void Cryptographer::decrypt() const {
           std::cerr << e.what() << std::endl;
           exit(1);
       }
-
+    //process(std::make_unique<CBC_Mode<Twofish::Decryption>>(), false);
     /*We should implement "shred" ourself*/
     system(("shred -u " + m_currentPath.generic_string()).c_str());
 }
