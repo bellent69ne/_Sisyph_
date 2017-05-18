@@ -66,7 +66,20 @@ void Cryptographer::encrypt() const {
           /*auto cbc(std::make_unique<CBC_Mode<Twofish>::Encryption>());
     process(cbc, true);*/
     /*******We should provide our implementation to system's shred*******/
-    std::system(("shred -u " + m_currentPath.generic_string()).c_str());
+    //std::system(("shred -u " + fileToShred()).c_str());
+    // REALLY BAD CODE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    /*auto forShredding(m_currentPath.generic_string());
+
+        auto itr(forShredding.cbegin());
+
+        while(itr != forShredding.cend()) {
+            if(*itr == ' ' && *(itr - 1) != '\\')
+                forShredding.insert(itr, '\\');
+
+            ++itr;
+        }*/
+
+      std::system(("shred -u " + m_currentPath.generic_string()).c_str());
 }
 
 /*****************************************************/
@@ -99,7 +112,22 @@ void Cryptographer::decrypt() const {
       }
     //process(std::make_unique<CBC_Mode<Twofish::Decryption>>(), false);
     /*We should implement "shred" ourself*/
-    system(("shred -u " + m_currentPath.generic_string()).c_str());
+      // Considered bad code !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      /*auto forShredding(m_currentPath.generic_string() + ".Sisyph");
+
+        auto itr(forShredding.cbegin());
+
+        while(itr != forShredding.cend()) {
+            if(*itr == ' ' && *(itr - 1) != '\\')
+                forShredding.insert(itr, '\\');
+
+            ++itr;
+        }
+
+      std::cout << forShredding << std::endl;
+*/
+    std::system(("shred -u " + m_currentPath.generic_string()).c_str());
+    //  std::cout << fileToShred() << std::endl;
 }
 
 void Cryptographer::generateKey() {

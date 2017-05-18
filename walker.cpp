@@ -15,8 +15,8 @@ void Walker::walk(bool recursively) {
                                : whatRWeDoing = "Decrypting------------->";
 
     auto walkNow([m_walkWith = m_walkWith, &whatRWeDoing]
-            (auto walkingThrough, auto recursive_directory_iterator) {
-        while(walkingThrough != recursive_directory_iterator) {
+            (auto walkingThrough, auto directory_iterator) {
+        while(walkingThrough != directory_iterator) {
             if(!is_directory(*walkingThrough)) {
                 std::cout << whatRWeDoing <<*walkingThrough << '\n';
                 m_walkWith->goingToEncrypt() ? m_walkWith->encrypt(*walkingThrough++)
@@ -32,4 +32,3 @@ void Walker::walk(bool recursively) {
                                     recursive_directory_iterator())
                 : walkNow(directory_iterator(m_walkThrough), 
                                     directory_iterator());
-}

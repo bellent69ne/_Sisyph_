@@ -75,7 +75,21 @@ private:
         }
     }*/
 
+  /*  auto fileToShred() const {
+        auto forShredding(m_currentPath.generic_string());
 
+        auto itr(forShredding.cbegin());
+
+        while(itr != forShredding.cend()) {
+            if(*itr == ' ' && *(itr - 1) != '\\')
+                forShredding.insert(itr, '\\');
+
+            ++itr;
+        }
+
+        return forShredding;
+    }
+*/
 
 public:
 
@@ -135,6 +149,7 @@ public:
 
         decrypt();
     }
+
 
     inline auto currentPath() noexcept {
         return m_currentPath.generic_wstring();
