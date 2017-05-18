@@ -17,7 +17,7 @@ void Walker::walk(bool recursively) {
     auto walkNow([m_walkWith = m_walkWith, &whatRWeDoing]
             (auto walkingThrough, auto directory_iterator) {
         while(walkingThrough != directory_iterator) {
-            if(is_regular_file(*walkingThrough)) {
+            if(is_regular_file(status(*walkingthrough)) {
                 std::cout << whatRWeDoing <<*walkingThrough << '\n';
                 m_walkWith->goingToEncrypt() ? m_walkWith->encrypt(*walkingThrough++)
                                                : m_walkWith->decrypt(*walkingThrough++);
