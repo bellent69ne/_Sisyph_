@@ -27,21 +27,29 @@ void Walker::walk(bool recursively) {
     m_walkWith->goingToEncrypt() ? whatRWeDoing = "Encrypting------------->"
                                : whatRWeDoing = "Decrypting------------->";
 
-    auto walkNow([m_walkWith = m_walkWith, &whatRWeDoing]
-            (auto walkingThrough, auto directory_iterator) {
-        while(walkingThrough != directory_iterator) {
-            if(is_regular_file(status(*walkingThrough))) {
-                std::cout << whatRWeDoing <<*walkingThrough << '\n';
-                m_walkWith->goingToEncrypt() ? m_walkWith->encrypt(*walkingThrough++)
+    if(is_regular_file(status(m_walkThrough))) {
+        std::cout << whatRWeDoing << m_walkThrough << '\n';
+        m_walkWith->goingToEncrypt() ? m_walkWith->encrypt(m_walkThrough)
+                                     : m_walkWith->decrypt(m_walkThrough);
+    }
+
+    else if(is_directory(status(m_walkThrough))) {
+        auto walkNow([m_walkWith = m_walkWith, &whatRWeDoing]
+                (auto walkingThrough, auto directory_iterator) {
+            while(walkingThrough != directory_iterator) {
+                if(is_regular_file(status(*walkingThrough))) {
+                    std::cout << whatRWeDoing <<*walkingThrough << '\n';
+                    m_walkWith->goingToEncrypt() ? m_walkWith->encrypt(*walkingThrough++)
                                                : m_walkWith->decrypt(*walkingThrough++);
+                }
+                else
+                    ++walkingThrough;
             }
-            else
-                ++walkingThrough;
-        }
-    });
+        });
     
-    recursively ? walkNow(recursive_directory_iterator(m_walkThrough), 
-                                    recursive_directory_iterator())
-                : walkNow(directory_iterator(m_walkThrough), 
-                                    directory_iterator());
+        recursively ? walkNow(recursive_directory_iterator(m_walkThrough), 
+                                        recursive_directory_iterator())
+                    : walkNow(directory_iterator(m_walkThrough), 
+                                        directory_iterator());
+    }
 }
