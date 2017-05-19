@@ -28,10 +28,10 @@ using CryptoPP::CBC_Mode;
 class Cryptographer {
 private:
     path m_currentPath;
-    int m_keyLength;
+    //int m_keyLength,
     std::string m_encKey;
     std::string m_encIV;
-    std::unique_ptr<SecByteBlock> m_byteKey;
+    SecByteBlock m_byteKey;
     byte m_byteIV[Twofish::BLOCKSIZE];
     bool m_goingToEncrypt;
     //std::unique_ptr<CBC_Mode<Twofish>::Encryption> m_twEncrypt;
@@ -111,7 +111,7 @@ public:
     >
     explicit inline Cryptographer(T&& fullPath) noexcept:
                         m_currentPath(std::forward<T>(fullPath)),
-                        m_keyLength(0),
+                       // m_keyLength(Twofish::MAX_KEYLENGTH),
                         m_encKey(""),
                         m_encIV(""),
                         m_goingToEncrypt(true) {
@@ -158,7 +158,7 @@ public:
     inline auto keyLength() noexcept {
         //if(m_keyLength < 0)
           //  m_keyLength = 0;
-        return m_keyLength;
+        return Twofish::MAX_KEYLENGTH;
     }
 
     template<typename T,
@@ -175,7 +175,7 @@ public:
 
     void generateKey();
 
-    template<typename T,
+    /*template<typename T,
              typename = std::enable_if_t<
                             std::is_integral<T>::value
                         >
@@ -183,7 +183,7 @@ public:
     void generateKey(T&& keyLength) {
         m_keyLength = std::forward<T>(keyLength);
         generateKey();
-    }
+    }*/
 
     void generateIV();
 
@@ -204,9 +204,16 @@ public:
                         >
     >
     void setKey(keyT&& newKey) {    // Probably it's not noexcept
-        m_encKey = std::forward<keyT>(newKey);
+        auto keyWithIV(std::forward<keyT>(newKey));
+        //m_encKey = std::forward<keyT>(newKey);
 
-        //if()
+        if(keyWithIV.length() != Twofish::MAX_KEYLENGTH * 3) {
+            std::cerr << "Invalid key is specified...\n";
+            exit(1);
+        }
+
+        m_encKey.assign(keyWithIV.cbegin(), keyWithIV.cend() - 32);
+
         auto decodedKey(static_cast<std::string>(""));
         StringSource resetKey(m_encKey, true,
             new HexDecoder(
@@ -214,10 +221,14 @@ public:
             )
         );
 
-        generateKey(m_encKey.length() / 2);
+        //generateKey(m_encKey.length() / 2);
 
         // Yet needs some consideration
-        m_byteKey->Assign((byte*) decodedKey.data(), decodedKey.size());
+        m_byteKey.Assign((byte*) decodedKey.data(), decodedKey.size());
+
+        keyWithIV.assign(keyWithIV.cend() - 32, keyWithIV.cend());
+
+        setIV(std::move(keyWithIV));
         /*auto convertToByte([&m_byteKey = m_byteKey, &decodedKey] {
             std::vector<byte> byteKey;
             for(auto& each: decodedKey) {

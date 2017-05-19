@@ -31,9 +31,10 @@ using CryptoPP::SecByteBlock;
 /**** WRONG!!!!!! ********************************
 ******** SMTH BAD HAPPENS HERE************************/
 Cryptographer::Cryptographer(): m_currentPath(""),
-                                m_keyLength(0),
+                                //m_keyLength(Twofish::MAX_KEYLENGTH),
                                 m_encKey(""),
-                                m_encIV(""), 
+                                m_encIV(""),
+                                m_byteKey(Twofish::MAX_KEYLENGTH),
                                 m_goingToEncrypt(true) {
 }
 
@@ -49,7 +50,7 @@ void Cryptographer::encrypt() const {
 
     try {
         CBC_Mode<Twofish>::Encryption cbcTwofish;
-        cbcTwofish.SetKeyWithIV(*m_byteKey, m_byteKey->size(),
+        cbcTwofish.SetKeyWithIV(m_byteKey, m_byteKey.size(),
                                 m_byteIV);
         FileSource file(m_currentPath.generic_string().c_str(), true,
             new StreamTransformationFilter(cbcTwofish,
@@ -94,7 +95,7 @@ void Cryptographer::decrypt() const {
 
     try {
         CBC_Mode<Twofish>::Decryption cbcTwofishD;
-        cbcTwofishD.SetKeyWithIV(*m_byteKey, m_byteKey->size(),
+        cbcTwofishD.SetKeyWithIV(m_byteKey, m_byteKey.size(),
                                  m_byteIV);
   
         auto sourceFile(m_currentPath);
@@ -131,22 +132,23 @@ void Cryptographer::decrypt() const {
 }
 
 void Cryptographer::generateKey() {
-    auto isBadKey([m_keyLength = m_keyLength] {
+    /*auto isBadKey([m_keyLength = m_keyLength] {
         return (m_keyLength <= 0) && 
                (m_keyLength != Twofish::DEFAULT_KEYLENGTH) ||
                (m_keyLength != Twofish::MAX_KEYLENGTH);
         });
 
     if(isBadKey())
-        m_keyLength = Twofish::DEFAULT_KEYLENGTH;
+        m_keyLength = Twofish::DEFAULT_KEYLENGTH;*/
+    
 
     //SecByteBlock key(m_keyLength);
-    m_byteKey = std::make_unique<SecByteBlock>(m_keyLength);
+    //m_byteKey = std::make_unique<SecByteBlock>(m_keyLength);
     AutoSeededRandomPool prng;
-    prng.GenerateBlock(*m_byteKey, m_byteKey->size());
+    prng.GenerateBlock(m_byteKey, m_byteKey.size());
 
     m_encKey.clear();
-    StringSource ssKey(*m_byteKey, m_byteKey->size(), true,
+    StringSource ssKey(m_byteKey, m_byteKey.size(), true,
         new HexEncoder (
             new StringSink(m_encKey)
         ) // For HexEncoder

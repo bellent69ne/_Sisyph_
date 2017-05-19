@@ -1,4 +1,6 @@
-/*************Soon***************/
+#ifndef WALKER_HPP
+#define WALKER_HPP
+
 #include <iostream>
 #include "cryptographer.hpp"
 #include <memory>
@@ -63,3 +65,4 @@ public:
 
     void walk(bool recursively);
 };
+#endif
