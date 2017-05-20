@@ -4,6 +4,7 @@
 #include <iostream>
 #include "cryptographer.hpp"
 #include <memory>
+#include <array>
 #include <type_traits>
 #include <boost/filesystem.hpp>
 using namespace boost::filesystem;
@@ -14,6 +15,7 @@ private:
     path m_walkThrough;
     // With we whom we're going to walk
     std::shared_ptr<Cryptographer> m_walkWith;
+    bool m_processAll;
 
 public:
     
@@ -33,7 +35,8 @@ public:
     >
     explicit inline Walker(pathT&& walkTo, walkWithT&& walkWith) noexcept:
                             m_walkThrough(std::forward<pathT>(walkTo)),
-                            m_walkWith(std::forward<walkWithT>(walkWith)) {
+                            m_walkWith(std::forward<walkWithT>(walkWith)),
+                            m_processAll(false) {
     }
 
     inline auto walks() const noexcept {
@@ -51,6 +54,8 @@ public:
     void walks(walkToT&& walkTo) noexcept {
         m_walkThrough = std::forward<walkToT>(walkTo);
     }
+
+    void findPath();
 
     /*inline auto walksWith() const noexcept {
         return m_walkWith;
