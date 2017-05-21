@@ -278,7 +278,7 @@ public:
     }
 
     // Requires consideration
-    inline bool goingToEncrypt() const {
+    inline bool willEncrypt() const {
         return m_goingToEncrypt;
     }
 

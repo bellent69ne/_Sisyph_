@@ -50,10 +50,10 @@ public:
 
 	inline auto actualKey() const {
 		//return m_fullParams.at(2);
-		if(m_fullParams.size() < m_maxArgsNumb)
-			return m_fullParams.at(2);
+		if(m_fullParams.size() == m_maxArgsNumb -1)
+			return m_fullParams.at(1);
 		
-		return m_fullParams.at(3);
+		return m_fullParams.at(1);
 	}
 
 //	inline
