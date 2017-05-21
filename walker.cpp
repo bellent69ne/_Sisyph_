@@ -9,39 +9,41 @@ void Walker::walk() {
         exit(1);
     }
 
-    std::cout << std::boolalpha << isRecursive() << std::endl;
-
-    std::cout << m_walkWith->willEncrypt() << std::endl;
-
-    std::cout << m_walkWith->getKey() + m_walkWith->getIV() << std::endl;
-
-    /*auto whatRWeDoing(static_cast<std::string>(""));
-    m_walkWith->goingToEncrypt() ? whatRWeDoing = "Encrypting------------->"
+    auto whatRWeDoing(static_cast<std::string>(""));
+    m_walkWith->willEncrypt() ? whatRWeDoing = "Encrypting------------->"
                                : whatRWeDoing = "Decrypting------------->";
 
-    if(fs::is_regular_file(m_walkThrough)) {
-        std::cout << whatRWeDoing << m_walkThrough << '\n';
-        m_walkWith->goingToEncrypt() ? m_walkWith->encrypt(m_walkThrough)
-                                     : m_walkWith->decrypt(m_walkThrough);
+    try {
+        auto pathToArg(m_cmdArgs.cbegin() + m_pathStarts);
+        while(pathToArg != m_cmdArgs.cend()) {
+            fs::exists(*pathToArg) ? m_walkThrough = *pathToArg
+                                   : m_walkThrough = fs::current_path() /= *pathToArg;
+        
+            if(fs::is_regular_file(m_walkThrough)) {
+                std::cout << whatRWeDoing << m_walkThrough.generic_string() <<'\n';
+                m_walkWith->willEncrypt() ? m_walkWith->encrypt(m_walkThrough)
+                                      : m_walkWith->decrypt(m_walkThrough);
+            }
+
+            else if(fs::is_directory(m_walkThrough) && isRecursive()) {
+                auto recursiveItr(static_cast<fs::recursive_directory_iterator>
+                                 (m_walkThrough));
+                while(recursiveItr != fs::recursive_directory_iterator()) {
+                    if(fs::is_regular_file(*recursiveItr)) {
+                        std::cout << whatRWeDoing << *recursiveItr << '\n';
+                        m_walkWith->willEncrypt() ? m_walkWith->encrypt(*recursiveItr)
+                                                  : m_walkWith->decrypt(*recursiveItr);
+                    }
+
+                    ++recursiveItr;
+                }
+            }
+
+            ++pathToArg;
+        }
+    }
+    catch(const fs::filesystem_error& e) {
+        std::cerr << e.what() << std::endl;
     }
 
-    /*else if(fs::is_directory(m_walkThrough)) {
-        auto walkNow([m_walkWith = m_walkWith, &whatRWeDoing]
-                (auto walkingThrough, auto directory_iterator) {
-            while(walkingThrough != directory_iterator) {
-                if(fs::is_regular_file(*walkingThrough)) {
-                    std::cout << whatRWeDoing <<*walkingThrough << '\n';
-                    m_walkWith->goingToEncrypt() ? m_walkWith->encrypt(*walkingThrough++)
-                                               : m_walkWith->decrypt(*walkingThrough++);
-                }
-                else
-                    ++walkingThrough;
-            }
-        });
-    
-        /*recursively ? walkNow(fs::recursive_directory_iterator(m_walkThrough), 
-                                        fs::recursive_directory_iterator())
-                    : walkNow(fs::directory_iterator(m_walkThrough), 
-                                        fs::directory_iterator());
-    }*/
 }

@@ -1,7 +1,6 @@
 #include <iostream>
 #include "cryptographer.hpp"
 #include "walker.hpp"
-#include "inpArgsCorrector.hpp"
 #include <fstream>
 
 int main(int argc, char **argv) {
@@ -17,15 +16,16 @@ int main(int argc, char **argv) {
     //else
       //  coolCryptor->setKey(correctInput.actualKey());
     
-    //auto saveKey(static_cast<std::ofstream>("confidential.dat"));
-    //saveKey << coolCryptor->getKey() + coolCryptor->getIV();
-    //saveKey.close();
+    
 
     Walker shadowWalker("/home", coolCryptor);
    // coolCryptor->willEncrypt(correctInput.wannaEncrypt());
     //shadowWalker.walk(correctInput.isRecursive());
 
     shadowWalker.setCmdArgs(argc, argv);
+    auto saveKey(static_cast<std::ofstream>("confidential.dat"));
+    saveKey << coolCryptor->getKey() + coolCryptor->getIV();
+    saveKey.close();
     shadowWalker.walk();
 //    std::cout << "KEY.... DON'T LOSE IT >>>>>>>>>>>>>>> " 
   //            << coolCryptor->getKey() + coolCryptor->getIV() << std::endl;

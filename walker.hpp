@@ -129,7 +129,7 @@ public:
             else
                 m_walkWith->setKey(m_cmdArgs.at(2));
         }
-        isRecursive() ? m_pathStarts = 5 : m_pathStarts = 4;
+        isRecursive() ? m_pathStarts = 4 : m_pathStarts = 3;
     }
 
 
