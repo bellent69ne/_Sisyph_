@@ -1,6 +1,7 @@
 #ifndef CRYPTOGRAPHER_HPP
 #define CRYPTOGRAPHER_HPP
 #include <string>
+#include <fstream>
 #include <boost/filesystem.hpp>
 using namespace boost::filesystem;
 
@@ -33,7 +34,7 @@ private:
     std::string m_encIV;
     SecByteBlock m_byteKey;
     byte m_byteIV[Twofish::BLOCKSIZE];
-    bool m_goingToEncrypt;
+    bool m_willEncrypt;
     //std::unique_ptr<CBC_Mode<Twofish>::Encryption> m_twEncrypt;
     //std::unique_ptr<CBC_Mode<Twofish>::Decryption> m_twDecrypt;
 
@@ -75,28 +76,11 @@ private:
         }
     }*/
 
-  /*  auto fileToShred() const {
-        auto forShredding(m_currentPath.generic_string());
-
-        auto itr(forShredding.cbegin());
-
-        while(itr != forShredding.cend()) {
-            if(*itr == ' ' && *(itr - 1) != '\\')
-                forShredding.insert(itr, '\\');
-
-            ++itr;
-        }
-
-        return forShredding;
-    }
-*/
-
 public:
 
     /*Requires som revision to m_keyLength*/
     Cryptographer();
 
-    /*May be we should check for std::is_constructible?*/
     template<typename T,
              typename = std::enable_if_t<
                             !std::is_base_of<
@@ -114,7 +98,7 @@ public:
                        // m_keyLength(Twofish::MAX_KEYLENGTH),
                         m_encKey(""),
                         m_encIV(""),
-                        m_goingToEncrypt(true) {
+                        m_willEncrypt(true) {
     }
 
 
@@ -156,8 +140,6 @@ public:
     }
     
     inline auto keyLength() noexcept {
-        //if(m_keyLength < 0)
-          //  m_keyLength = 0;
         return Twofish::MAX_KEYLENGTH;
     }
 
@@ -174,16 +156,6 @@ public:
     } // Probably noexcept too
 
     void generateKey();
-
-    /*template<typename T,
-             typename = std::enable_if_t<
-                            std::is_integral<T>::value
-                        >
-    >
-    void generateKey(T&& keyLength) {
-        m_keyLength = std::forward<T>(keyLength);
-        generateKey();
-    }*/
 
     void generateIV();
 
@@ -208,8 +180,24 @@ public:
         //m_encKey = std::forward<keyT>(newKey);
 
         if(keyWithIV.length() != Twofish::MAX_KEYLENGTH * 3) {
-            std::cerr << "Invalid key is specified...\n";
-            exit(1);
+            if(exists(newKey)) {
+                auto keyFile(static_cast<std::ifstream>(keyWithIV));
+                keyWithIV.clear();
+                keyFile >> keyWithIV;
+                keyFile.close();
+            }
+            else if(!exists(newKey)) {
+                auto keyFilePath(static_cast<path>(currentPath()));
+                keyFilePath /= keyWithIV;
+                auto keyFile(static_cast<std::ifstream>(keyFilePath.generic_string()));
+                keyWithIV.clear();
+                keyFile >> keyWithIV;
+                keyFile.close();
+            }
+            else {
+                std::cerr << "Invalid key is specified...\n";
+                exit(1);
+            }
         }
 
         m_encKey.assign(keyWithIV.cbegin(), keyWithIV.cend() - 32);
@@ -229,18 +217,6 @@ public:
         keyWithIV.assign(keyWithIV.cend() - 32, keyWithIV.cend());
 
         setIV(std::move(keyWithIV));
-        /*auto convertToByte([&m_byteKey = m_byteKey, &decodedKey] {
-            std::vector<byte> byteKey;
-            for(auto& each: decodedKey) {
-                byteKey.push_back(each);
-            }
-
-            m_byteKey->Assign(byteKey.data(), byteKey.size());
-        });
-
-        convertToByte();*/
-
-        //std::cout << "decoded " << decodedKey << std::endl;
     }
 
     template<typename ivT,  
@@ -279,11 +255,11 @@ public:
 
     // Requires consideration
     inline bool willEncrypt() const {
-        return m_goingToEncrypt;
+        return m_willEncrypt;
     }
 
     inline void willEncrypt(bool trueOrFalse) {
-        m_goingToEncrypt = trueOrFalse;
+        m_willEncrypt = trueOrFalse;
     }
 };
 

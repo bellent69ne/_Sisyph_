@@ -25,17 +25,26 @@ void Walker::walk() {
                                       : m_walkWith->decrypt(m_walkThrough);
             }
 
+            // Recursive works really strange
             else if(fs::is_directory(m_walkThrough) && isRecursive()) {
                 auto recursiveItr(static_cast<fs::recursive_directory_iterator>
                                  (m_walkThrough));
+                
                 while(recursiveItr != fs::recursive_directory_iterator()) {
                     if(fs::is_regular_file(*recursiveItr)) {
                         std::cout << whatRWeDoing << *recursiveItr << '\n';
-                        m_walkWith->willEncrypt() ? m_walkWith->encrypt(*recursiveItr)
-                                                  : m_walkWith->decrypt(*recursiveItr);
+                        auto filename(static_cast<fs::path>(*recursiveItr));
+                        if(m_walkWith->willEncrypt() && 
+                            filename.extension() != ".sisyph")
+                            m_walkWith->encrypt(*recursiveItr++);
+                
+                        else if(!m_walkWith->willEncrypt() && 
+                            filename.extension() == ".sisyph") 
+                            m_walkWith->decrypt(*recursiveItr++);
                     }
 
-                    ++recursiveItr;
+                    else
+                        ++recursiveItr;
                 }
             }
 

