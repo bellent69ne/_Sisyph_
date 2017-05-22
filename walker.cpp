@@ -17,7 +17,7 @@ void Walker::walk() {
         auto pathToArg(m_cmdArgs.cbegin() + m_pathStarts);
         while(pathToArg != m_cmdArgs.cend()) {
             fs::exists(*pathToArg) ? m_walkThrough = *pathToArg
-                                   : m_walkThrough = fs::current_path() /= *pathToArg;
+                                   : m_walkThrough = fs::current_path() / *pathToArg;
         
             if(fs::is_regular_file(m_walkThrough)) {
                 std::cout << whatRWeDoing << m_walkThrough.generic_string() <<'\n';

@@ -40,7 +40,7 @@ Cryptographer::Cryptographer(): m_currentPath(""),
 
 
 
-void Cryptographer::encrypt() const {
+void Cryptographer::encrypt() {
     if(m_currentPath.extension() == ".sisyph") {
         std::cerr << "File is already encrypted..." << std::endl;
         exit(1);
@@ -66,12 +66,12 @@ void Cryptographer::encrypt() const {
       }
           
 
-      std::system(("shred -u " + m_currentPath.generic_string()).c_str());
+      m_shredder.shredFile(&m_currentPath);
 }
 
 /*****************************************************/
 
-void Cryptographer::decrypt() const {
+void Cryptographer::decrypt() {
     if(m_currentPath.extension() != ".sisyph") {
         std::cerr << "The file is decrypted..." << std::endl;
         exit(1);
@@ -98,7 +98,7 @@ void Cryptographer::decrypt() const {
           exit(1);
       }
  
-    std::system(("shred -u " + m_currentPath.generic_string()).c_str());
+    m_shredder.shredFile(&m_currentPath);
     //  std::cout << fileToShred() << std::endl;
 }
 

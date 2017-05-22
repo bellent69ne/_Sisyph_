@@ -26,17 +26,18 @@ using CryptoPP::FileSink;
 #include "modes.h"
 using CryptoPP::CBC_Mode;
 
+#include "shredder.hpp"
+
 class Cryptographer {
 private:
     path m_currentPath;
-    //int m_keyLength,
     std::string m_encKey;
     std::string m_encIV;
     SecByteBlock m_byteKey;
     byte m_byteIV[Twofish::BLOCKSIZE];
     bool m_willEncrypt;
-    //std::unique_ptr<CBC_Mode<Twofish>::Encryption> m_twEncrypt;
-    //std::unique_ptr<CBC_Mode<Twofish>::Decryption> m_twDecrypt;
+    Shredder m_shredder;
+    
 
     
         
@@ -102,7 +103,7 @@ public:
     }
 
 
-    void encrypt() const;
+    void encrypt();
 
     template<typename T,
              typename = std::enable_if_t<
@@ -118,7 +119,7 @@ public:
         encrypt();
     }
 
-    void decrypt() const;
+    void decrypt();
 
     template<typename T,
              typename = std::enable_if_t<
