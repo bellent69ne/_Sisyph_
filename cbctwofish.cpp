@@ -1,37 +1,10 @@
 #include "cbctwofish.hpp"
-#include <string>
 #include <cstdlib>
-#include <fstream>
 #include <vector>
 #include "osrng.h"
 using CryptoPP::AutoSeededRandomPool;
 
-#include "cryptlib.h"
-using CryptoPP::Exception;
-
-#include "hex.h"
-using CryptoPP::HexEncoder;
-using CryptoPP::HexDecoder;
-
-#include "filters.h"
-using CryptoPP::StringSink;
-using CryptoPP::StringSource;
-
-#include "twofish.h"
-using CryptoPP::Twofish;
-
-#include "modes.h"
-using CryptoPP::CBC_Mode;
-
-#include "secblock.h"
-using CryptoPP::SecByteBlock;
-
-
-/**** Implementation of Encryption method itself *****/
-/**** WRONG!!!!!! ********************************
-******** SMTH BAD HAPPENS HERE************************/
 CBCTwofish::CBCTwofish(): m_currentPath(""),
-                                //m_keyLength(Twofish::MAX_KEYLENGTH),
                                 m_encKey(""),
                                 m_encIV(""),
                                 m_byteKey(Twofish::MAX_KEYLENGTH),

@@ -64,7 +64,7 @@ public:
 			return false;
 		}
 
-		std::cout << "Size of file: " << fileSize << " bytes\n";
+		//std::cout << "Size of file: " << fileSize << " bytes\n";
 
 		//std::vector<unsigned char> buffer(fileSize);
 		const auto blockSize(1024);
@@ -73,8 +73,9 @@ public:
 
 		auto fileItrLocation(static_cast<long long>(0));
 
-		std::ofstream logFile("logFile.dat");
-		logFile << "Size of file: " << fileSize << " bytes\n\n";
+		//std::ofstream logFile("logFile.dat");
+		//logFile << "Size of file: " << fileSize << " bytes\n\n";
+
 		while(fileItrLocation < fileSize) {
 			auto iterations(5);
 		// Overwrite file with ASCII 255 and ASCII 0 multiple times
@@ -114,7 +115,7 @@ public:
 			fileItrLocation += blockSize;
 		}
 
-		logFile << "Destroyed " << fileItrLocation << " bytes\n";
+		//logFile << "Destroyed " << fileItrLocation << " bytes\n";
 
 		// Change file size to 0
 		fout.close();

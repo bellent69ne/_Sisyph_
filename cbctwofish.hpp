@@ -19,6 +19,7 @@ using CryptoPP::StreamTransformationFilter;
 
 #include "hex.h"
 using CryptoPP::HexDecoder;
+using CryptoPP::HexEncoder;
 
 #include "files.h"
 using CryptoPP::FileSource;
