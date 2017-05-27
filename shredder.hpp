@@ -12,21 +12,21 @@ namespace fs = boost::filesystem;
 class Shredder {
 private:
 	//std::shared_ptr<fs::path> m_fileToShred;
-	std::unique_ptr<fs::path> m_fileToShred;
+	fs::path m_fileToShred;
 public:
-	template<typename T//,
-			// typename = std::enable_if<
-			 //				!std::is_base_of<
-			 	//				Shredder,
-			 	//				std::decay_t<T>
-			 	//			>::value &&
-			 	//			std::is_constructible<fs::path,
-			 	//				std::decay_t<T>
-			 	//			>::value
-			 	//		>
-	>
-	explicit Shredder(T pathToFile):
-					m_fileToShred(std::make_unique<T>(pathToFile)) {
+	template<typename T,
+			 typename = std::enable_if<
+			 				!std::is_base_of<
+			 					Shredder,
+			 					std::decay_t<T>
+			 				>::value &&
+			 				std::is_constructible<fs::path,
+			 					std::decay_t<T>
+			 				>::value
+			 			>
+	>	// doesn't work properly with pointer
+	explicit Shredder(T&& pathToFile):
+					m_fileToShred(std::forward<T>(pathToFile)) {
 	}
 
 	auto randomRename() {
@@ -34,15 +34,14 @@ public:
 		auto attempts(0);
 
 		while(attempts <maxRenameAttempts) {
-			auto newPath(static_cast<const fs::path>(m_fileToShred->parent_path() 
+			auto newPath(static_cast<const fs::path>(m_fileToShred.parent_path() 
 									/ fs::unique_path().generic_string()));
 			if(!fs::exists(newPath)) {
 				boost::system::error_code ec;
-				fs::rename(*m_fileToShred, newPath, ec);
+				fs::rename(m_fileToShred, newPath, ec);
 				if(ec)
-					std::cerr << "Failed renaming " << fs::absolute(*m_fileToShred)
+					std::cerr << "Failed renaming " << fs::absolute(m_fileToShred)
 							  << " to " << fs::absolute(newPath) << std::endl;
-
 				else
 					return newPath;
 			}
@@ -51,16 +50,16 @@ public:
 
 	auto writeRandomData() {
 		boost::system::error_code ec;
-		const auto fileSize(static_cast<long long>(fs::file_size(*m_fileToShred, ec)));
+		const auto fileSize(static_cast<long long>(fs::file_size(m_fileToShred, ec)));
 		if(ec) {
 			std::cerr << "Failed determining the size of " 
-					  << fs::absolute(*m_fileToShred) << ec.message() << std::endl;
+					  << fs::absolute(m_fileToShred) << ec.message() << std::endl;
 			return false;
 		}
 
-		std::ofstream fout(m_fileToShred->generic_string(), std::ios::binary);
+		std::ofstream fout(m_fileToShred.generic_string(), std::ios::binary);
 		if(!fout) {
-			std::cerr << "Failed opening " << fs::absolute(*m_fileToShred)
+			std::cerr << "Failed opening " << fs::absolute(m_fileToShred)
 					  << strerror(errno) << std::endl;
 			return false;
 		}
@@ -119,7 +118,7 @@ public:
 
 		// Change file size to 0
 		fout.close();
-		fout.open(m_fileToShred->generic_string(), std::ios::binary);
+		fout.open(m_fileToShred.generic_string(), std::ios::binary);
 
 		fout.close();
 
@@ -135,7 +134,7 @@ public:
 			 			>
 	>
 	void shredFile(T&& newFile) {
-		*m_fileToShred = std::forward<T>(newFile);
+		m_fileToShred = std::forward<T>(newFile);
 
 		shredFile();
 	}

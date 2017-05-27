@@ -2,7 +2,7 @@
 #define WALKER_HPP
 
 #include <iostream>
-#include "cryptographer.hpp"
+#include "cbctwofish.hpp"
 #include <memory>
 #include <vector>
 #include <string>
@@ -16,7 +16,7 @@ private:
     // Where we going to walk
     path m_walkThrough;
     // With we whom we're going to walk
-    std::shared_ptr<Cryptographer> m_walkWith;
+    std::shared_ptr<CBCTwofish> m_walkWith;
     std::vector<std::string> m_cmdArgs;
     int m_pathStarts;
 
@@ -30,7 +30,7 @@ public:
                                 std::decay_t<pathT>
                             >::value &&
                             std::is_constructible<
-                                Cryptographer,
+                                CBCTwofish,
                                 walkWithT
                             >::value
 
