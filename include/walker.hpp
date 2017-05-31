@@ -46,7 +46,7 @@ public:
         return m_walkThrough.generic_wstring();
     }
 
-    template <typename walkToT, 
+    template <typename walkToT,
         typename = std::enable_if<
             std::is_assignable<
                 path,
@@ -81,7 +81,7 @@ public:
         return recursive;
     }
 
-    template<typename T, typename cmdArgs, 
+    template<typename T, typename cmdArgs,
         typename = std::enable_if<
             std::is_integral<std::decay_t<T>>::value &&
             std::is_assignable<std::string,
@@ -90,7 +90,9 @@ public:
         >
     >
     void setCmdArgs(T&& paramsNum, cmdArgs params) {
-        m_cmdArgs.assign(params, params + paramsNum);   
+        m_cmdArgs.assign(params, params + paramsNum);
+
+        const auto minNumbOfParams(4);
 
         auto operation([](std::string& option) {
             if (option == "-e" || option == "--encrypt") {
@@ -101,14 +103,10 @@ public:
             }
 
             std::cerr << "Usage: ./sisyph -r(optional) "
-                         "--encrypt --keyGen /path" 
+                         "--encrypt --keyGen /path"
                       << std::endl;
-            exit(1);
+            exit(-1);
         });
-
-        isRecursive()
-            ? m_walkWith->willEncrypt(operation(m_cmdArgs.at(2)))
-            : m_walkWith->willEncrypt(operation(m_cmdArgs.at(1)));
 
         auto keyGen([](std::string& keyOption) {
             if (keyOption == "--keyGen") {
@@ -119,35 +117,46 @@ public:
             }
         });
 
-        if (isRecursive()) {
-            if (keyGen(m_cmdArgs.at(3))) {
-                m_walkWith->generateKey();
-                m_walkWith->generateIV();
-            }
-            else {
-                m_walkWith->setKey(m_cmdArgs.at(3));
-            }
-        }
+        try {
+            isRecursive()
+                ? m_walkWith->willEncrypt(operation(m_cmdArgs.at(2)))
+                : m_walkWith->willEncrypt(operation(m_cmdArgs.at(1)));
 
-        else {
-            if (keyGen(m_cmdArgs.at(2))) {
-                m_walkWith->generateKey();
-                m_walkWith->generateIV();
-            }
-            else {
-                m_walkWith->setKey(m_cmdArgs.at(2));
-            }
-        }
 
-        isRecursive() ? m_pathStarts = 4 : m_pathStarts = 3;
+
+                if (isRecursive()) {
+                    if (keyGen(m_cmdArgs.at(3))) {
+                        m_walkWith->generateKey();
+                        m_walkWith->generateIV();
+                    }
+                    else {
+                        m_walkWith->setKey(m_cmdArgs.at(3));
+                    }
+                }
+
+                else {
+                    if (keyGen(m_cmdArgs.at(2))) {
+                        m_walkWith->generateKey();
+                        m_walkWith->generateIV();
+                    }
+                    else {
+                        m_walkWith->setKey(m_cmdArgs.at(2));
+                    }
+                }
+
+                isRecursive() ? m_pathStarts = 4 : m_pathStarts = 3;
+            }
+            catch(const std::exception &e) {
+                usage();
+            }
     }
 
 
     void usage() {
         std::cerr << "Usage: ./sisyph -r(optional)"
-                     " --encrypt --keyGen /path" 
+                     " --encrypt --keyGen /path"
                   << std::endl;
-        exit(1);
+        exit(-1);
     }
 };
 
