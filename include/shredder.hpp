@@ -31,30 +31,35 @@ public:
                     m_fileToShred(std::forward<T>(pathToFile)) {
     }
 
-    auto randomRename() {
+    template<typename pathT,
+        typename = std::enable_if_t<
+            std::is_assignable<
+                fs::path,
+                std::decay_t<pathT>
+            >::value
+        >
+    >
+    void randomRename(pathT& newPath) {
         constexpr auto maxRenameAttempts(10);
         auto attempts(0);
 
-        while(attempts <maxRenameAttempts) {
+        while(attempts < maxRenameAttempts) {
             auto newPath(
                 static_cast<const fs::path>(
-                    m_fileToShred.parent_path() / 
-                    fs::unique_path().generic_string()
+                    m_fileToShred.parent_path() / fs::unique_path().generic_string()
                 )
             );
-
-            if (!fs::exists(newPath)) {
+            if(!fs::exists(newPath)) {
                 boost::system::error_code ec;
                 fs::rename(m_fileToShred, newPath, ec);
-
-                if (ec) {
+                if(ec) {
                     std::cerr << "Failed renaming " 
                               << fs::absolute(m_fileToShred)
                               << " to " 
-                              << fs::absolute(newPath) << std::endl;
-                }
-                else {
-                    return newPath;
+                              << fs::absolute(newPath) 
+                              << std::endl;
+
+                    newPath = m_fileToShred.parent_path() / "azazaLalka";
                 }
             }
         }

@@ -189,9 +189,7 @@ public:
 
         if (keyWithIV.length() != Twofish::MAX_KEYLENGTH * 3) {
             if(exists(newKey)) {
-                auto keyFile(
-                    static_cast<std::ifstream>(keyWithIV)
-                );
+                std::ifstream keyFile(keyWithIV);
 
                 keyWithIV.clear();
                 keyFile >> keyWithIV;
@@ -203,12 +201,7 @@ public:
                 );
 
                 keyFilePath /= keyWithIV;
-
-                auto keyFile(
-                    static_cast<std::ifstream>(
-                        keyFilePath.generic_string()
-                    )
-                );
+                std::ifstream keyFile(keyFilePath.generic_string());
 
                 keyWithIV.clear();
                 keyFile >> keyWithIV;
