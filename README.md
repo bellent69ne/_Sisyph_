@@ -2,6 +2,6 @@
 
 
 ```Bash
-$ sudo apt-get --yes install libboost-filesystem-dev libboost-system-dev libcrypto++-dev libstdc++6
+$ sudo apt-get --yes install libboost-all-dev libcrypto++-dev libstdc++6 clang
 $ make
 ```
