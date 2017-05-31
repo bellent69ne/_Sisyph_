@@ -6,8 +6,7 @@ void Shredder::shredFile() {
         return;
     }
 
-    auto renamedPath(static_cast<fs::path>(""));
-    auto newPath(static_cast<fs::path>(randomRename(renamedPath)));
+    auto newPath(randomRename());
     //fs::path newPath(randomRename(renamedPath));
 
     boost::system::error_code ec;
