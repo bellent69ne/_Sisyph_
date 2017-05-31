@@ -31,38 +31,35 @@ public:
                     m_fileToShred(std::forward<T>(pathToFile)) {
     }
 
-    template<typename pathT,
-        typename = std::enable_if_t<
-            std::is_assignable<
-                fs::path,
-                std::decay_t<pathT>
-            >::value
-        >
-    >
-    void randomRename(pathT& newPath) {
+    auto randomRename() {
         constexpr auto maxRenameAttempts(10);
         auto attempts(0);
 
+        auto newPath(static_cast<fs::path>(""));
         while(attempts < maxRenameAttempts) {
-            auto newPath(
+            newPath =
                 static_cast<const fs::path>(
                     m_fileToShred.parent_path() / fs::unique_path().generic_string()
-                )
-            );
+                );
+
             if(!fs::exists(newPath)) {
                 boost::system::error_code ec;
                 fs::rename(m_fileToShred, newPath, ec);
-                if(ec) {
-                    std::cerr << "Failed renaming " 
-                              << fs::absolute(m_fileToShred)
-                              << " to " 
-                              << fs::absolute(newPath) 
-                              << std::endl;
+                if(!ec)
+                    break;
 
-                    newPath = m_fileToShred.parent_path() / "azazaLalka";
+                else if(ec) {
+                    std::cerr << "Failed renaming "
+                              << fs::absolute(m_fileToShred)
+                              << " to "
+                              << fs::absolute(newPath)
+                              << std::endl;
                 }
+
             }
+            ++attempts;
         }
+        return newPath;
     }
 
     auto writeRandomData() {
@@ -74,9 +71,9 @@ public:
         );
 
         if (ec) {
-            std::cerr << "Failed determining the size of " 
-                      << fs::absolute(m_fileToShred) 
-                      << ec.message() 
+            std::cerr << "Failed determining the size of "
+                      << fs::absolute(m_fileToShred)
+                      << ec.message()
                       << std::endl;
 
             return false;
@@ -86,9 +83,9 @@ public:
             m_fileToShred.generic_string(), std::ios::binary
         );
         if (!fout) {
-            std::cerr << "Failed opening " 
+            std::cerr << "Failed opening "
                       << fs::absolute(m_fileToShred)
-                      << strerror(errno) 
+                      << strerror(errno)
                       << std::endl;
 
             return false;
@@ -99,7 +96,7 @@ public:
 
         const auto blockSize(1024);
         std::vector<unsigned char> buffer(blockSize);
-        
+
 
         auto fileItrLocation(static_cast<long long>(0));
 
