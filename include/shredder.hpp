@@ -7,142 +7,174 @@
 #include <fstream>
 #include <iostream>
 #include <boost/filesystem.hpp>
+
 namespace fs = boost::filesystem;
+
 
 class Shredder {
 private:
-	//std::shared_ptr<fs::path> m_fileToShred;
-	fs::path m_fileToShred;
+    //std::shared_ptr<fs::path> m_fileToShred;
+    fs::path m_fileToShred;
 public:
-	template<typename T,
-			 typename = std::enable_if<
-			 				!std::is_base_of<
-			 					Shredder,
-			 					std::decay_t<T>
-			 				>::value &&
-			 				std::is_constructible<fs::path,
-			 					std::decay_t<T>
-			 				>::value
-			 			>
-	>	// doesn't work properly with pointer
-	explicit Shredder(T&& pathToFile):
-					m_fileToShred(std::forward<T>(pathToFile)) {
-	}
+    template<typename T,
+        typename = std::enable_if<
+            !std::is_base_of<
+                Shredder,
+                std::decay_t<T>
+            >::value &&
+                std::is_constructible<fs::path,
+                std::decay_t<T>
+            >::value
+        >
+    > // doesn't work properly with pointer
+    explicit Shredder(T&& pathToFile):
+                    m_fileToShred(std::forward<T>(pathToFile)) {
+    }
 
-	auto randomRename() {
-		constexpr auto maxRenameAttempts(10);
-		auto attempts(0);
+    auto randomRename() {
+        constexpr auto maxRenameAttempts(10);
+        auto attempts(0);
 
-		while(attempts <maxRenameAttempts) {
-			auto newPath(static_cast<const fs::path>(m_fileToShred.parent_path() 
-									/ fs::unique_path().generic_string()));
-			if(!fs::exists(newPath)) {
-				boost::system::error_code ec;
-				fs::rename(m_fileToShred, newPath, ec);
-				if(ec)
-					std::cerr << "Failed renaming " << fs::absolute(m_fileToShred)
-							  << " to " << fs::absolute(newPath) << std::endl;
-				else
-					return newPath;
-			}
-		}
-	}
+        while(attempts <maxRenameAttempts) {
+            auto newPath(
+                static_cast<const fs::path>(
+                    m_fileToShred.parent_path() / 
+                    fs::unique_path().generic_string()
+                )
+            );
 
-	auto writeRandomData() {
-		boost::system::error_code ec;
-		const auto fileSize(static_cast<long long>(fs::file_size(m_fileToShred, ec)));
-		if(ec) {
-			std::cerr << "Failed determining the size of " 
-					  << fs::absolute(m_fileToShred) << ec.message() << std::endl;
-			return false;
-		}
+            if (!fs::exists(newPath)) {
+                boost::system::error_code ec;
+                fs::rename(m_fileToShred, newPath, ec);
 
-		std::ofstream fout(m_fileToShred.generic_string(), std::ios::binary);
-		if(!fout) {
-			std::cerr << "Failed opening " << fs::absolute(m_fileToShred)
-					  << strerror(errno) << std::endl;
-			return false;
-		}
+                if (ec) {
+                    std::cerr << "Failed renaming " 
+                              << fs::absolute(m_fileToShred)
+                              << " to " 
+                              << fs::absolute(newPath) << std::endl;
+                }
+                else {
+                    return newPath;
+                }
+            }
+        }
+    }
 
-		//std::cout << "Size of file: " << fileSize << " bytes\n";
+    auto writeRandomData() {
+        boost::system::error_code ec;
+        const auto fileSize(
+            static_cast<long long>(
+                fs::file_size(m_fileToShred, ec)
+            )
+        );
 
-		//std::vector<unsigned char> buffer(fileSize);
-		const auto blockSize(1024);
-		std::vector<unsigned char> buffer(blockSize);
-		
+        if (ec) {
+            std::cerr << "Failed determining the size of " 
+                      << fs::absolute(m_fileToShred) 
+                      << ec.message() 
+                      << std::endl;
 
-		auto fileItrLocation(static_cast<long long>(0));
+            return false;
+        }
 
-		//std::ofstream logFile("logFile.dat");
-		//logFile << "Size of file: " << fileSize << " bytes\n\n";
+        std::ofstream fout(
+            m_fileToShred.generic_string(), std::ios::binary
+        );
+        if (!fout) {
+            std::cerr << "Failed opening " 
+                      << fs::absolute(m_fileToShred)
+                      << strerror(errno) 
+                      << std::endl;
 
-		while(fileItrLocation < fileSize) {
-			auto iterations(5);
-		// Overwrite file with ASCII 255 and ASCII 0 multiple times
-			while(iterations--) {
-				const auto ch(static_cast<unsigned char>((iterations & 1) ? 255 : 0));
-				for(auto& bufferElement: buffer)
-					bufferElement = ch;
+            return false;
+        }
 
-				fout.seekp(fileItrLocation, std::ios::beg);
-				fout.write((char*) &buffer[0], buffer.size());
-				fout.flush();
-			}
-		
+        //std::cout << "Size of file: " << fileSize << " bytes\n";
+        //std::vector<unsigned char> buffer(fileSize);
 
-			std::random_device seed;
-			std::mt19937 randomSeeder(seed());
-			std::uniform_int_distribution<> generate(0, 128);
+        const auto blockSize(1024);
+        std::vector<unsigned char> buffer(blockSize);
+        
 
-			for(auto& bufferElement: buffer)
-				bufferElement = generate(randomSeeder);
+        auto fileItrLocation(static_cast<long long>(0));
 
-			fout.seekp(fileItrLocation, std::ios::beg);
-			fout.write((char*) &buffer[0], buffer.size());
-			fout.flush();
+        //std::ofstream logFile("logFile.dat");
+        //logFile << "Size of file: " << fileSize << " bytes\n\n";
 
-			// Overwrite file with null chars
-			for(auto& bufferElement: buffer)
-				bufferElement = 0;
+        while (fileItrLocation < fileSize) {
+            auto iterations(5);
 
-			fout.seekp(fileItrLocation, std::ios::beg);
-			fout.write((char*) &buffer[0], buffer.size());
-			fout.flush();
+            // Overwrite file with ASCII 255 and ASCII 0
+            while (iterations--) {
+                const auto ch(
+                    static_cast<unsigned char>(
+                        (iterations & 1) ? 255 : 0
+                    )
+                );
 
+                for (auto& bufferElement: buffer) {
+                    bufferElement = ch;
+                }
 
+                fout.seekp(fileItrLocation, std::ios::beg);
+                fout.write((char*) &buffer[0], buffer.size());
+                fout.flush();
+            }
 
-			// Move to the next block
-			fileItrLocation += blockSize;
-		}
+            std::random_device seed;
+            std::mt19937 randomSeeder(seed());
+            std::uniform_int_distribution<> generate(0, 128);
 
-		//logFile << "Destroyed " << fileItrLocation << " bytes\n";
+            for (auto& bufferElement: buffer) {
+                bufferElement = generate(randomSeeder);
+            }
 
-		// Change file size to 0
-		fout.close();
-		fout.open(m_fileToShred.generic_string(), std::ios::binary);
+            fout.seekp(fileItrLocation, std::ios::beg);
+            fout.write((char*) &buffer[0], buffer.size());
+            fout.flush();
 
-		fout.close();
+            // Overwrite file with null chars
+            for (auto& bufferElement: buffer) {
+                bufferElement = 0;
+            }
 
-		return true;
-	}
+            fout.seekp(fileItrLocation, std::ios::beg);
+            fout.write((char*) &buffer[0], buffer.size());
+            fout.flush();
 
-	template<typename T,
-			 typename = std::enable_if<
-			 				//std::is_pointer<T>::value &&
-			 				std::is_assignable<fs::path,
-			 					std::decay_t<T>
-			 				>::value
-			 			>
-	>
-	void shredFile(T&& newFile) {
-		m_fileToShred = std::forward<T>(newFile);
+            // Move to the next block
+            fileItrLocation += blockSize;
+        }
 
-		shredFile();
-	}
+        //logFile << "Destroyed " << fileItrLocation << " bytes\n";
+        // Change file size to 0
 
-	void shredFile();
+        fout.close();
+        fout.open(m_fileToShred.generic_string(), std::ios::binary);
 
-	Shredder() = default;
+        fout.close();
+
+        return true;
+    }
+
+    template<typename T,
+        typename = std::enable_if<
+            //std::is_pointer<T>::value &&
+            std::is_assignable<fs::path,
+                std::decay_t<T>
+            >::value
+        >
+    >
+    void shredFile(T&& newFile) {
+        m_fileToShred = std::forward<T>(newFile);
+
+        shredFile();
+    }
+
+    void shredFile();
+
+    Shredder() = default;
 };
+
 
 #endif
