@@ -12,8 +12,8 @@ int main(int argc, char **argv) {
 
     shadowWalker.setCmdArgs(argc, argv);
 
-    std::ofstream saveKey("confidential.dat");
-    
+    std::ofstream saveKey("key.dat");
+
     saveKey << coolCryptor->getKey() + coolCryptor->getIV();
     saveKey.close();
     shadowWalker.walk();

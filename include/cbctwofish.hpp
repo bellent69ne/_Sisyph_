@@ -71,7 +71,7 @@ private:
             FileSource file(
                 m_currentPath.generic_string().c_str(), true,
                 new StreamTransformationFilter(cbcTwofish,
-                    new FileSink((sinkFile.generic_string() 
+                    new FileSink((sinkFile.generic_string()
                             + fileExt).c_str()
                     )
                 )
@@ -84,7 +84,7 @@ private:
 
         m_shredder.shredFile(m_currentPath);
     }
-    
+
 
 public:
     /*Requires som revision to m_keyLength*/
@@ -146,7 +146,7 @@ public:
     inline auto currentPath() noexcept {
         return m_currentPath.generic_wstring();
     }
-    
+
     inline auto keyLength() noexcept {
         return Twofish::MAX_KEYLENGTH;
     }
@@ -154,7 +154,7 @@ public:
     template<typename T,
         typename = std::enable_if_t<
             std::is_assignable<
-                path, 
+                path,
                 std::decay_t<T>
             >::value
         >
@@ -175,7 +175,7 @@ public:
         return m_encIV;
     }
 
-    template<typename keyT, 
+    template<typename keyT,
         typename = std::enable_if_t<
             std::is_assignable<
                 std::string,
@@ -232,7 +232,7 @@ public:
         setIV(std::move(keyWithIV));
     }
 
-    template<typename ivT,  
+    template<typename ivT,
         typename = std::enable_if_t<
             std::is_assignable<
                 std::string,
