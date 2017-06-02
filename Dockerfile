@@ -12,11 +12,4 @@ RUN apt-get --yes update && \
         libstdc++6 \
         make \
         git && \
-    git clone https://github.com/devmalic/_Sisyph_.git && \
-    git clone https://github.com/rust-lang/book.git test && \
-    cd _Sisyph_ && \
-    make && \
-    apt-get --yes purge git make clang && \
-    cd - && \
-    mv _Sisyph_/bin/sisyph . && \
-    rm -rf _Sisyph_
+    git clone https://github.com/rust-lang/book.git test
