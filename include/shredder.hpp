@@ -13,7 +13,6 @@ namespace fs = boost::filesystem;
 
 class Shredder {
 private:
-    //std::shared_ptr<fs::path> m_fileToShred;
     fs::path m_fileToShred;
 public:
     template<typename T,
@@ -26,7 +25,7 @@ public:
                 std::decay_t<T>
             >::value
         >
-    > // doesn't work properly with pointer
+    >
     explicit Shredder(T&& pathToFile):
                     m_fileToShred(std::forward<T>(pathToFile)) {
     }
@@ -91,17 +90,10 @@ public:
             return false;
         }
 
-        //std::cout << "Size of file: " << fileSize << " bytes\n";
-        //std::vector<unsigned char> buffer(fileSize);
-
         const auto blockSize(1024);
         std::vector<unsigned char> buffer(blockSize);
 
-
         auto fileItrLocation(static_cast<long long>(0));
-
-        //std::ofstream logFile("logFile.dat");
-        //logFile << "Size of file: " << fileSize << " bytes\n\n";
 
         while (fileItrLocation < fileSize) {
             auto iterations(5);
@@ -148,7 +140,6 @@ public:
             fileItrLocation += blockSize;
         }
 
-        //logFile << "Destroyed " << fileItrLocation << " bytes\n";
         // Change file size to 0
 
         fout.close();

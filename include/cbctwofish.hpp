@@ -79,7 +79,6 @@ private:
 
         } catch (const CryptoPP::Exception& exception) {
             std::cerr << exception.what() << std::endl;
-            exit(1);
         }
 
         m_shredder.shredFile(m_currentPath);
@@ -87,7 +86,6 @@ private:
 
 
 public:
-    /*Requires som revision to m_keyLength*/
     CBCTwofish();
 
     template<typename T,
@@ -222,9 +220,6 @@ public:
             )
         );
 
-        //generateKey(m_encKey.length() / 2);
-
-        // Yet needs some consideration
         m_byteKey.Assign((byte*) decodedKey.data(), decodedKey.size());
 
         keyWithIV.assign(keyWithIV.cend() - 32, keyWithIV.cend());
@@ -242,11 +237,6 @@ public:
     >
     void setIV(ivT&& newIV) {
         m_encIV = std::forward<ivT>(newIV);
-
-        /*if(m_encIV.length() != Twofish::BLOCKSIZE) {
-            std::cerr << "IV is less than blocksize...";
-            exit(1);
-        }*/
 
         auto decodedIV(static_cast<std::string>(""));
         StringSource resetIV(m_encIV, true,
@@ -266,7 +256,6 @@ public:
         convertToByte();
     }
 
-    // Requires consideration
     inline bool willEncrypt() const {
         return m_willEncrypt;
     }
