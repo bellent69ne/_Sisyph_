@@ -6,12 +6,13 @@
 
 using CryptoPP::AutoSeededRandomPool;
 
-// Default constructed mode
+// Default constructed mode,
 CBCTwofish::CBCTwofish(): m_currentPath(""),
                                 m_encKey(""),
                                 m_encIV(""),
                                 m_byteKey(Twofish::MAX_KEYLENGTH),
-                                m_willEncrypt(true) {
+                                m_willEncrypt(true),
+                                m_loggedFiles("loggedFiles.dat") {
 }
 
 

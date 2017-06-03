@@ -41,6 +41,7 @@ private:
     byte m_byteIV[Twofish::BLOCKSIZE];
     bool m_willEncrypt;
     Shredder m_shredder;
+    std::ofstream m_loggedFiles;
 
     template<typename activityT, typename extensionT,
         typename = std::enable_if_t<
@@ -77,6 +78,8 @@ private:
                 )
             );
 
+            m_loggedFiles << m_currentPath << '\n';
+
         } catch (const CryptoPP::Exception& exception) {
             std::cerr << exception.what() << std::endl;
         }
@@ -104,7 +107,8 @@ public:
             // m_keyLength(Twofish::MAX_KEYLENGTH),
             m_encKey(""),
             m_encIV(""),
-            m_willEncrypt(true) {
+            m_willEncrypt(true),
+            m_loggedFiles("loggedFiles.dat") {
     }
 
 
