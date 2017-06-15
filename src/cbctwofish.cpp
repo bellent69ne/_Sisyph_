@@ -17,22 +17,24 @@ CBCTwofish::CBCTwofish(): m_currentPath(""),
 
 
 void CBCTwofish::encrypt() {
-    if (m_currentPath.extension() == ".sisyph")
+    if (m_currentPath.extension() == ".sisyph") {
         std::cerr << "Already encrypted... Skipping --------> "
                   << m_currentPath << std::endl;
+        return;
+    }
 
-    else
-        process<CBC_Mode<Twofish>::Encryption>(".sisyph");
+    process<CBC_Mode<Twofish>::Encryption>(".sisyph");
 }
 
 
 void CBCTwofish::decrypt() {
-    if (m_currentPath.extension() != ".sisyph")
+    if (m_currentPath.extension() != ".sisyph") {
         std::cerr << "Already decrypted... Skipping -------> "
                   << m_currentPath << std::endl;
-
-    else
-        process<CBC_Mode<Twofish>::Decryption>("");
+        return;
+    }
+    
+    process<CBC_Mode<Twofish>::Decryption>("");
 }
 
 

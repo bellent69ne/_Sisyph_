@@ -50,5 +50,6 @@ void Walker::walk() {
         }
     } catch(const fs::filesystem_error& e) {
         std::cerr << e.what() << std::endl;
+        exit(-1);
     }
 }
