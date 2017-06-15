@@ -22,6 +22,16 @@ void Walker::walk() {
                     m_walkThrough = *pathToArg :
                     m_walkThrough = fs::current_path() / *pathToArg;
 
+            /*Checking for system directories(for example "/proc")*/
+            auto afterSlash(m_walkThrough.begin());
+            ++afterSlash;
+            for(auto &sysDir: m_sysDirectories)
+                if(*afterSlash == sysDir) {
+                    ++pathToArg;
+                    continue;
+                }
+
+
             if (fs::is_regular_file(m_walkThrough)) {
                 std::cout << whatRWeDoing << m_walkThrough.generic_string() << '\n';
                 m_walkWith->willEncrypt() ?
@@ -50,5 +60,6 @@ void Walker::walk() {
         }
     } catch(const fs::filesystem_error& e) {
         std::cerr << e.what() << std::endl;
+        exit(-1);
     }
 }

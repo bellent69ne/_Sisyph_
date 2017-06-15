@@ -7,6 +7,7 @@
 #include <string>
 #include <type_traits>
 #include <iterator>
+#include <array>
 #include <boost/filesystem.hpp>
 
 #include "cbctwofish.hpp"
@@ -18,10 +19,12 @@ class Walker {
 private:
     // Where we going to walk
     path m_walkThrough;
-    // With we whom we're going to walk
+    // With whom we're going to walk
     std::shared_ptr<CBCTwofish> m_walkWith;
     std::vector<std::string> m_cmdArgs;
     int m_pathStarts;
+    std::array<std::string, 8> m_sysDirectories
+        {"usr", "sbin", "proc", "sys", "var", "lib", "tmp"};
 public:
     //Needs some consideration, but for now, i think it's ok;)
     template<typename pathT, typename walkWithT,
