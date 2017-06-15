@@ -23,7 +23,8 @@ void Walker::walk() {
                     m_walkThrough = fs::current_path() / *pathToArg;
 
             /*Checking for system directories(for example "/proc")*/
-            auto inSysDir([&m_walkThrough = m_walkThrough]() {
+            auto inSysDir([&m_walkThrough = m_walkThrough,
+                &m_sysDirectories = m_sysDirectories]() {
                 auto afterSlash(m_walkThrough.begin());
                 ++afterSlash;
 
@@ -32,7 +33,7 @@ void Walker::walk() {
                         return true;
 
                 return false;
-            })
+            });
 
             if (fs::is_regular_file(m_walkThrough) && !inSysDir()) {
                 std::cout << whatRWeDoing
