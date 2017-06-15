@@ -23,22 +23,26 @@ void Walker::walk() {
                     m_walkThrough = fs::current_path() / *pathToArg;
 
             /*Checking for system directories(for example "/proc")*/
-            auto afterSlash(m_walkThrough.begin());
-            ++afterSlash;
-            for(auto &sysDir: m_sysDirectories)
-                if(*afterSlash == sysDir) {
-                    ++pathToArg;
-                    continue;
-                }
+            auto inSysDir([&m_walkThrough = m_walkThrough]() {
+                auto afterSlash(m_walkThrough.begin());
+                ++afterSlash;
 
+                for(auto &sysDir: m_sysDirectories)
+                    if(*afterSlash == sysDir)
+                        return true;
 
-            if (fs::is_regular_file(m_walkThrough)) {
-                std::cout << whatRWeDoing << m_walkThrough.generic_string() << '\n';
+                return false;
+            })
+
+            if (fs::is_regular_file(m_walkThrough) && !inSysDir()) {
+                std::cout << whatRWeDoing
+                          << m_walkThrough.generic_string() << '\n';
                 m_walkWith->willEncrypt() ?
                         m_walkWith->encrypt(m_walkThrough) :
                         m_walkWith->decrypt(m_walkThrough);
             }
-            else if (fs::is_directory(m_walkThrough) && isRecursive()) {
+            else if (fs::is_directory(m_walkThrough)
+                     && isRecursive() && !inSysDir()) {
                 auto recursiveItr(
                     static_cast<fs::recursive_directory_iterator>(m_walkThrough)
                 );

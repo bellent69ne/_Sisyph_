@@ -23,7 +23,7 @@ private:
     std::shared_ptr<CBCTwofish> m_walkWith;
     std::vector<std::string> m_cmdArgs;
     int m_pathStarts;
-    std::array<std::string, 8> m_sysDirectories
+    std::array<std::string, 7> m_sysDirectories
         {"usr", "sbin", "proc", "sys", "var", "lib", "tmp"};
 public:
     //Needs some consideration, but for now, i think it's ok;)
