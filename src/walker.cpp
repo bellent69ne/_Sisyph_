@@ -42,7 +42,7 @@ void Walker::walk() {
                         m_walkWith->decrypt(m_walkThrough);
             }
             else if (fs::is_directory(m_walkThrough)
-                && isRecursive() && !inSysDir(m_walkThrough)) {
+                && isRecursive()) {
                 auto recursiveItr(
                     static_cast<fs::recursive_directory_iterator>(m_walkThrough)
                 );
