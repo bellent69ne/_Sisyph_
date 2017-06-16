@@ -34,22 +34,20 @@ void Walker::walk() {
                 return false;
             });
 
-            if (fs::is_regular_file(m_walkThrough) && !inSysDir(m_walkThrough)) {
+            if (fs::is_regular_file(m_walkThrough)) {
                 std::cout << whatRWeDoing
                           << m_walkThrough.generic_string() << '\n';
                 m_walkWith->willEncrypt() ?
                         m_walkWith->encrypt(m_walkThrough) :
                         m_walkWith->decrypt(m_walkThrough);
             }
-            else if (fs::is_directory(m_walkThrough)
-                && isRecursive()) {
+            else if (fs::is_directory(m_walkThrough) && isRecursive()) {
                 auto recursiveItr(
                     static_cast<fs::recursive_directory_iterator>(m_walkThrough)
                 );
 
                 while (recursiveItr != fs::recursive_directory_iterator()) {
-                    if (fs::is_regular_file(*recursiveItr)
-                        && !inSysDir(fs::path(*recursiveItr))) {
+                    if (fs::is_regular_file(*recursiveItr)) {
                         std::cout << whatRWeDoing << *recursiveItr << '\n';
 
                         m_walkWith->willEncrypt() ?
