@@ -3,7 +3,8 @@
 
 ### Compile 
 ```Bash
-$ sudo apt-get --yes install libboost-all-dev libcrypto++-dev libstdc++6 clang
+$ sudo pacman -S boost crypto++ cmake
+$ cd build/ && cmake ../
 $ make
 ```
 
