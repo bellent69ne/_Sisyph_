@@ -6,7 +6,6 @@
 #include <vector>
 #include <string>
 #include <type_traits>
-#include <iterator>
 #include <array>
 #include <boost/filesystem.hpp>
 
@@ -155,7 +154,7 @@ public:
     }
 
 
-    void usage() {
+    inline void usage() {
         std::cerr << "Usage: ./sisyph -r(optional)"
                      " --encrypt --keyGen /path"
                   << std::endl;
