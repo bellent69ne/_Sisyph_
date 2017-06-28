@@ -1,4 +1,5 @@
 #include "shredder.hpp"
+#include <future>
 
 fs::path Shredder::randomRename() {
     constexpr auto maxRenameAttempts(10);
@@ -60,13 +61,70 @@ bool Shredder::writeRandomData() {
         return false;
     }
 
-    const auto blockSize(1024);
-    std::vector<unsigned char> buffer(blockSize);
+    //const auto blockSize(1024);
+    //std::vector<unsigned char> buffer(blockSize);
 
-    auto fileItrLocation(static_cast<long long>(0));
+    auto numOfBranches(0);
+    auto overwrite([&numOfBranches = numOfBranches,
+                    &fileSize = fileSize, &fout = fout]
+                    (bool viaBlocks, short index) {
+        ++numOfBranches;
+
+        std::random_device seed;
+        std::mt19937 randomSeeder(seed());
+        std::uniform_int_distribution<> generate(0, 127);
+
+        thread_local std::vector<char> buffer;
+
+        auto writeAndFlush([&fout = fout, &buffer = buffer]
+            (long long startingPoint) {
+            fout.seekp(startingPoint, std::ios::beg);
+            fout.write((char *) buffer[0], buffer.size());
+            fout.flush();
+        });
+        // if we're gonna overwrite via blocks of data
+        if(viaBlocks) {
+            const auto blockSize(1024);
+
+            thread_local auto startingPoint(blockSize * index);
+
+            while(startingPoint < fileSize) {
+                buffer.resize(blockSize);
+
+                for(auto& bufferElement: buffer)
+                    bufferElement = generate(randomSeeder);
+
+                writeAndFlush(startingPoint);
+
+                for(auto& bufferElement: buffer)
+                    bufferElement = 0;
+
+                writeAndFlush(startingPoint);
+
+                startingPoint += blockSize * numOfBranches;
+            }
+        }
+
+        else {
+            buffer.resize(fileSize);
+
+            for(auto& bufferElement: buffer)
+                bufferElement = generate(randomSeeder);
+
+            writeAndFlush(0);
+
+            for(auto& bufferElement: buffer)
+                bufferElement = 0;
+
+            writeAndFlush(0);
+        }
+
+    });
+
+/*    auto fileItrLocation(static_cast<long long>(0));
 
     while (fileItrLocation < fileSize) {
-        auto iterations(5);
+      /*  auto iterations(5);
 
         // Overwrite file with ASCII 255 and ASCII 0
         while (iterations--) {
@@ -87,7 +145,7 @@ bool Shredder::writeRandomData() {
 
         std::random_device seed;
         std::mt19937 randomSeeder(seed());
-        std::uniform_int_distribution<> generate(0, 128);
+        std::uniform_int_distribution<> generate(0, 127);
 
         for (auto& bufferElement: buffer) {
             bufferElement = generate(randomSeeder);
@@ -108,9 +166,17 @@ bool Shredder::writeRandomData() {
 
         // Move to the next block
         fileItrLocation += blockSize;
-    }
+    }*/
 
     // Change file size to 0
+    auto destroy(std::async(overwrite, true, 0));
+    auto destroy1(std::async(overwrite, true, 1));
+    auto destroy2(std::async(overwrite, true, 2));
+    auto destroy3(std::async(overwrite, true, 3));
+    destroy.wait();
+    destroy1.wait();
+    destroy2.wait();
+    destroy3.wait();
 
     fout.close();
     fout.open(m_fileToShred.generic_string(), std::ios::binary);
