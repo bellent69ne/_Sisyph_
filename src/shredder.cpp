@@ -79,7 +79,7 @@ bool Shredder::writeRandomData() {
         auto writeAndFlush([&fout = fout, &buffer = buffer]
             (long long startingPoint) {
             fout.seekp(startingPoint, std::ios::beg);
-            fout.write((char *) buffer[0], buffer.size());
+            fout.write((char *) &buffer[0], buffer.size());
             fout.flush();
         });
 
