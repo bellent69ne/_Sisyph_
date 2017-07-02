@@ -1,103 +1,66 @@
-#include "cbctwofish.hpp"
-#include <string>
-#include <cstdlib>
-#include <fstream>
 #include <vector>
+#include <cstdlib>
+
 #include "osrng.h"
+#include "cbctwofish.hpp"
+
 using CryptoPP::AutoSeededRandomPool;
 
-#include "cryptlib.h"
-using CryptoPP::Exception;
-
-#include "hex.h"
-using CryptoPP::HexEncoder;
-using CryptoPP::HexDecoder;
-
-#include "filters.h"
-using CryptoPP::StringSink;
-using CryptoPP::StringSource;
-
-#include "twofish.h"
-using CryptoPP::Twofish;
-
-#include "modes.h"
-using CryptoPP::CBC_Mode;
-
-#include "secblock.h"
-using CryptoPP::SecByteBlock;
-
-
-/**** Implementation of Encryption method itself *****/
-/**** WRONG!!!!!! ********************************
-******** SMTH BAD HAPPENS HERE************************/
-CBCTwofish::CBCTwofish(): BlockCipher() {
+// Default constructed mode,
+CBCTwofish::CBCTwofish():
+                        Cipher(),
+                        m_encIV(""),
+                        m_byteKey(Twofish::MAX_KEYLENGTH),
+                        m_shredder(),
+                        m_loggedFiles("loggedFiles.dat") {
 }
 
 
-
-virtual void CBCTwofish::encrypt() override {
-    if(m_currentPath.extension() == ".sisyph") {
-        std::cerr << "File is already encrypted..." << std::endl;
-        exit(1);
+void CBCTwofish::encrypt() {
+    if (m_currentPath.extension() == ".sisyph") {
+        std::cerr << "Already encrypted... Skipping --------> "
+                  << m_currentPath << std::endl;
+        return;
     }
 
-    /***********************************************************/
-
-    try {
-        CBC_Mode<Twofish>::Encryption cbcTwofish;
-        cbcTwofish.SetKeyWithIV(m_byteKey, m_byteKey.size(),
-                                m_byteIV);
-        FileSource file(m_currentPath.generic_string().c_str(), true,
-            new StreamTransformationFilter(cbcTwofish,
-                new FileSink((m_currentPath.generic_string() 
-                              + ".sisyph").c_str()
-                )
-            )
-        );
-
-    } catch(const CryptoPP::Exception& e) {
-          std::cerr << e.what() << std::endl;
-          exit(1);
-      }
-          
-
-      m_shredder.shredFile(m_currentPath);
+    process<CBC_Mode<Twofish>::Encryption>(".sisyph");
 }
 
-/*****************************************************/
+void CBCTwofish::encrypt(const filesystem::path& fullPath) {
+    m_currentPath = fullPath;
 
-virtual void CBCTwofish::decrypt() override {
-    if(m_currentPath.extension() != ".sisyph") {
-        std::cerr << "The file is decrypted..." << std::endl;
-        exit(1);
+    encrypt();
+}
+
+void CBCTwofish::encrypt(filesystem::path&& fullPath) {
+    m_currentPath = std::move(fullPath);
+
+    encrypt();
+}
+
+void CBCTwofish::decrypt() {
+    if (m_currentPath.extension() != ".sisyph") {
+        std::cerr << "Already decrypted... Skipping -------> "
+                  << m_currentPath << std::endl;
+        return;
     }
-    
-    /********************************************************/
 
-    try {
-        CBC_Mode<Twofish>::Decryption cbcTwofishD;
-        cbcTwofishD.SetKeyWithIV(m_byteKey, m_byteKey.size(),
-                                 m_byteIV);
-  
-        auto sourceFile(m_currentPath);
-        sourceFile.replace_extension("");
-
-        FileSource file(m_currentPath.generic_string().c_str(), true,
-            new StreamTransformationFilter(cbcTwofishD,
-                new FileSink(sourceFile.generic_string().c_str()
-                )
-            )
-        );
-    } catch(const CryptoPP::Exception &e) {
-          std::cerr << e.what() << std::endl;
-          exit(1);
-      }
- 
-    m_shredder.shredFile(m_currentPath);
-    //  std::cout << fileToShred() << std::endl;
+    process<CBC_Mode<Twofish>::Decryption>("");
 }
 
-virtual void CBCTwofish::generateKey() override {
+void CBCTwofish::decrypt(const filesystem::path& fullPath) {
+    m_currentPath = fullPath;
+
+    decrypt();
+}
+
+void CBCTwofish::decrypt(filesystem::path&& fullPath) {
+    m_currentPath = std::move(fullPath);
+
+    decrypt();
+}
+
+void CBCTwofish::generateKey() {
     AutoSeededRandomPool prng;
     prng.GenerateBlock(m_byteKey, m_byteKey.size());
 
@@ -105,24 +68,66 @@ virtual void CBCTwofish::generateKey() override {
     StringSource ssKey(m_byteKey, m_byteKey.size(), true,
         new HexEncoder (
             new StringSink(m_encKey)
-        ) // For HexEncoder
-    );  // For StringSource
-    /*From this point we have our key in m_encKey(probably
-                                                  encoded)*/;
+        )
+    );
+
+    generateIV();
 }
 
-virtual void CBCTwofish::generateIV() override {
+void CBCTwofish::generateIV() {
     AutoSeededRandomPool prng;
-
-    if(!m_byteIV)
-        m_byteIV = std::make_unique<byte[]>(Twofish::BLOCKSIZE);
-
     prng.GenerateBlock(m_byteIV, sizeof(m_byteIV));
 
     m_encIV.clear();
     StringSource ssIV(m_byteIV, sizeof(m_byteIV), true,
         new HexEncoder (
             new StringSink(m_encIV)
-        )   // For HexEncoder
-    );  // For StringSource
+        )
+    );
+}
+
+void CBCTwofish::setKey(const std::string& newKey) {
+    auto keyWithIV(newKey);
+    //m_encKey = std::forward<keyT>(newKey);
+
+    if (keyWithIV.length() != Twofish::MAX_KEYLENGTH * 3) {
+        if(filesystem::exists(newKey)) {
+            std::ifstream keyFile(keyWithIV);
+
+            keyWithIV.clear();
+            keyFile >> keyWithIV;
+            keyFile.close();
+        }
+        else if (!filesystem::exists(newKey)) {
+            auto keyFilePath(
+                static_cast<filesystem::path>(currentPath())
+            );
+
+            keyFilePath /= keyWithIV;
+            std::ifstream keyFile(keyFilePath.generic_string());
+
+            keyWithIV.clear();
+            keyFile >> keyWithIV;
+            keyFile.close();
+        }
+        else {
+            std::cerr << "Invalid key is specified..." << std::endl;
+            exit(1);
+        }
+    }
+
+    m_encKey.assign(keyWithIV.cbegin(), keyWithIV.cend() - 32);
+
+    auto decodedKey(static_cast<std::string>(""));
+    StringSource resetKey(m_encKey, true,
+        new HexDecoder(
+            new StringSink(decodedKey)
+        )
+    );
+
+    m_byteKey.Assign((byte*) decodedKey.data(), decodedKey.size());
+
+    keyWithIV.assign(keyWithIV.cend() - 32, keyWithIV.cend());
+
+    setIV(std::move(keyWithIV));
 }
