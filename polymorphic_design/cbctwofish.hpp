@@ -6,7 +6,7 @@
 #include <boost/filesystem.hpp>
 using namespace boost;
 
-#include "cipher.hpp"
+#include "symmetric.hpp"
 
 #include "secblock.h"
 using CryptoPP::SecByteBlock;
@@ -33,14 +33,11 @@ using CryptoPP::CBC_Mode;
 #include "shredder.hpp"
 
 
-class CBCTwofish: public Cipher {
+class CBCTwofish: public Symmetric {
 private:
-    //filesystem::path m_currentPath;
-    //std::string m_encKey;
     std::string m_encIV;
     SecByteBlock m_byteKey;
     byte m_byteIV[Twofish::BLOCKSIZE];
-    //bool m_willEncrypt;
     Shredder m_shredder;
     std::ofstream m_loggedFiles;
 
@@ -104,7 +101,7 @@ public:
         >
     >
     explicit inline CBCTwofish(T&& fullPath) noexcept:
-            Cipher(std::forward<T>(fullPath)),
+            Symmetric(std::forward<T>(fullPath)),
             m_encIV(""),
             m_shredder(),
             m_loggedFiles("loggedFiles.dat") {
@@ -113,39 +110,11 @@ public:
 
     virtual void encrypt() override;
 
-    virtual void encrypt(const filesystem::path& fullPath) override;
-
-    virtual void encrypt(filesystem::path&& fullPath) override;//{
-//        m_currentPath = std::forward<pathT>(fullPath);
-//
-//        encrypt();
-//    }
-
     virtual void decrypt() override;
 
-    virtual void decrypt(const filesystem::path& fullPath) override;
-
-    virtual void decrypt(filesystem::path&& fullPath) override;// {
-//        m_currentPath = std::forward<pathT>(fullPath);
-//
-//        decrypt();
-//    }
-
-
-    inline virtual filesystem::path currentPath() noexcept override {
-        return m_currentPath.generic_wstring();
-    }
 
     inline virtual int keyLength() noexcept override {
         return Twofish::MAX_KEYLENGTH;
-    }
-
-    inline void setPath(const filesystem::path& newPath) noexcept override {
-        m_currentPath = std::move(newPath);
-    }
-
-    inline void setPath(filesystem::path&& newPath) noexcept override {
-        m_currentPath = std::move(newPath);
     }
 
     virtual void generateKey() override;
@@ -191,13 +160,6 @@ public:
         convertToByte();
     }
 
-//    inline virtual bool willEncrypt() const noexcept override {
-//        return m_willEncrypt;
-//    }
-//
-//    inline virtual void (bool trueOrFalse) noexcept override {
-//        m_willEncrypt = trueOrFalse;
-//    }
 };
 
 

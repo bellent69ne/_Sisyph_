@@ -4,7 +4,7 @@ namespace fs = boost::filesystem;
 
 
 void Walker::walk() {
-    if (m_walkWith->getKey().empty()) //|| m_walkWith->getIV().empty()) {
+    if (m_walkWith->getKey().empty()) {
         std::cerr << "Key or iv isn't specified..." << '\n';
         exit(1);
     }

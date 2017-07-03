@@ -8,7 +8,7 @@ using CryptoPP::AutoSeededRandomPool;
 
 // Default constructed mode,
 CBCTwofish::CBCTwofish():
-                        Cipher(),
+                        Symmetric(),
                         m_encIV(""),
                         m_byteKey(Twofish::MAX_KEYLENGTH),
                         m_shredder(),
@@ -23,19 +23,8 @@ void CBCTwofish::encrypt() {
         return;
     }
 
+    /* We definitely can choose cipher modes */
     process<CBC_Mode<Twofish>::Encryption>(".sisyph");
-}
-
-void CBCTwofish::encrypt(const filesystem::path& fullPath) {
-    m_currentPath = fullPath;
-
-    encrypt();
-}
-
-void CBCTwofish::encrypt(filesystem::path&& fullPath) {
-    m_currentPath = std::move(fullPath);
-
-    encrypt();
 }
 
 void CBCTwofish::decrypt() {
@@ -48,17 +37,6 @@ void CBCTwofish::decrypt() {
     process<CBC_Mode<Twofish>::Decryption>("");
 }
 
-void CBCTwofish::decrypt(const filesystem::path& fullPath) {
-    m_currentPath = fullPath;
-
-    decrypt();
-}
-
-void CBCTwofish::decrypt(filesystem::path&& fullPath) {
-    m_currentPath = std::move(fullPath);
-
-    decrypt();
-}
 
 void CBCTwofish::generateKey() {
     AutoSeededRandomPool prng;
