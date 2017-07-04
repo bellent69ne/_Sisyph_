@@ -104,7 +104,6 @@ public:
     >
     explicit inline CBCTwofish(T&& fullPath) noexcept:
             m_currentPath(std::forward<T>(fullPath)),
-            // m_keyLength(Twofish::MAX_KEYLENGTH),
             m_encKey(""),
             m_encIV(""),
             m_willEncrypt(true),
@@ -114,32 +113,32 @@ public:
 
     void encrypt();
 
-    template<typename T,
+    template<typename pathT,
         typename = std::enable_if_t<
             std::is_assignable<
                 path,
-                std::decay_t<T>
+                std::decay_t<pathT>
             >::value
         >
     >
-    void encrypt(T&& fullPath) {
-        m_currentPath = std::forward<T>(fullPath);
+    void encrypt(pathT&& fullPath) {
+        m_currentPath = std::forward<pathT>(fullPath);
 
         encrypt();
     }
 
     void decrypt();
 
-    template<typename T,
+    template<typename pathT,
              typename = std::enable_if_t<
                             std::is_assignable<
                                 path,
-                                std::decay_t<T>
+                                std::decay_t<pathT>
                             >::value
                         >
     >
-    void decrypt(T&& fullPath) {
-        m_currentPath = std::forward<T>(fullPath);
+    void decrypt(pathT&& fullPath) {
+        m_currentPath = std::forward<pathT>(fullPath);
 
         decrypt();
     }
@@ -153,16 +152,16 @@ public:
         return Twofish::MAX_KEYLENGTH;
     }
 
-    template<typename T,
+    template<typename pathT,
         typename = std::enable_if_t<
             std::is_assignable<
                 path,
-                std::decay_t<T>
+                std::decay_t<pathT>
             >::value
         >
     >
-    inline void setPath(T&& newPath) noexcept {
-        m_currentPath = std::forward<T>(newPath);
+    inline void setPath(pathT&& newPath) noexcept {
+        m_currentPath = std::forward<pathT>(newPath);
     }
 
     void generateKey();
@@ -260,11 +259,11 @@ public:
         convertToByte();
     }
 
-    inline bool willEncrypt() const {
+    inline bool willEncrypt() const noexcept {
         return m_willEncrypt;
     }
 
-    inline void willEncrypt(bool trueOrFalse) {
+    inline void willEncrypt(bool trueOrFalse) noexcept {
         m_willEncrypt = trueOrFalse;
     }
 };

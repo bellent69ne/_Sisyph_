@@ -4,13 +4,10 @@
 #include "osrng.h"
 #include "cbctwofish.hpp"
 
-using CryptoPP::AutoSeededRandomPool;
-
 // Default constructed mode,
 CBCTwofish::CBCTwofish():
-                        Symmetric(),
-                        m_encIV(""),
-                        m_byteKey(Twofish::MAX_KEYLENGTH),
+                        Block_Cipher("", Twofish::BLOCKSIZE,
+                                     Twofish::MAX_KEYLENGTH),
                         m_shredder(),
                         m_loggedFiles("loggedFiles.dat") {
 }

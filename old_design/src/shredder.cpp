@@ -67,7 +67,7 @@ bool Shredder::writeRandomData() {
 
         return false;
     }
-    // permitted memory for processing
+    // permitted memory for processing (up to 10 MB)
     constexpr auto permittedMemory(1024 * 1024 * 10);
     // number of branches meaning the total number of tasks running
     auto numOfBranches(0);

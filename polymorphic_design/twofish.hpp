@@ -89,11 +89,12 @@ public:
 
     virtual void generateIV() override;
 
-     virtual std::string getKey() noexcept override {
+    inline virtual std::string getKey() noexcept override {
         return m_encKey + m_encIV;
     }
 
     virtual void setKey(const std::string& newKey) override;
+
 };
 
 
