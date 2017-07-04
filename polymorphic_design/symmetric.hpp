@@ -1,6 +1,7 @@
 #ifndef Symmetric_HPP
 #define Symmetric_HPP
 
+#include "namespace_sisyph.hpp"
 #include <string>
 #include <boost/filesystem.hpp>
 using namespace boost;
@@ -8,7 +9,7 @@ using namespace boost;
 /* Base class for All symmetric cryptographic
    algorithms
 */
-class Symmetric {
+class sisyph::Symmetric {
 protected:
     // current path whic we are processing
     filesystem::path m_currentPath;

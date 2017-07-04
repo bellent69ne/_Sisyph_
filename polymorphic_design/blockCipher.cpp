@@ -1,6 +1,6 @@
-#include "block_cipher.hpp"
+#include "blockCipher.hpp"
 
-Block_Cipher::~Block_Cipher() {
+sisyph::BlockCipher::~BlockCipher() {
     if(m_byteIV) {
         for(auto iii(0); iii < m_blockSize; ++iii)
             m_byteIV[iii] = 0;

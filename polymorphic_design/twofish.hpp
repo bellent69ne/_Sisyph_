@@ -1,15 +1,15 @@
-#ifndef CBCTWOFISH_HPP
-#define CBCTWOFISH_HPP
+#ifndef TWOFISH_HPP
+#define TWOFISH_HPP
 
 #include <fstream>
-#include "block_cipher.hpp"
+#include "blockCipher.hpp"
 #include "twofish.h"
 #include "files.h"
 #include "modes.h"
 #include "shredder.hpp"
 
 
-class CBCTwofish: public Block_Cipher {
+class sisyph::Twofish: public sisyph::BlockCipher {
 private:
     Shredder m_shredder;
     std::ofstream m_loggedFiles;
@@ -24,8 +24,8 @@ private:
     >
     void process(extensionT&& fileExtension) {
         try {
-            activityT cbcTwofish;
-            cbcTwofish.SetKeyWithIV(
+            activityT twofish;
+            twofish.SetKeyWithIV(
                 m_byteKey, m_byteKey.size(), m_byteIV
             );
 
@@ -42,7 +42,7 @@ private:
 
             FileSource file(
                 m_currentPath.generic_string().c_str(), true,
-                new StreamTransformationFilter(cbcTwofish,
+                new StreamTransformationFilter(twofish,
                     new FileSink((sinkFile.generic_string()
                             + fileExt).c_str()
                     )
@@ -60,12 +60,12 @@ private:
 
 
 public:
-    CBCTwofish();
+    Twofish();
 
     template<typename T,
         typename = std::enable_if_t<
             !std::is_base_of<
-                CBCTwofish,
+                sisyph::Twofish,
                 std::decay_t<T>
             >::value && std::is_constructible<
                 filesystem::path,
@@ -73,9 +73,10 @@ public:
             >::value
         >
     >
-    explicit inline CBCTwofish(T&& fullPath) noexcept:
-            Block_Cipher(std::forward<T>(fullPath), Twofish::MAX_KEYLENGTH,
-                         Twofish::BLOCKSIZE),
+    explicit inline Twofish(T&& fullPath) noexcept:
+            BlockCipher(std::forward<T>(fullPath),
+                        CryptoPP::Twofish::MAX_KEYLENGTH,
+                        CryptoPP::Twofish::BLOCKSIZE),
             m_shredder(),
             m_loggedFiles("loggedFiles.dat") {
     }
@@ -89,12 +90,11 @@ public:
 
     virtual void generateIV() override;
 
-    inline virtual std::string getKey() noexcept override {
+     virtual std::string getKey() noexcept override {
         return m_encKey + m_encIV;
     }
 
     virtual void setKey(const std::string& newKey) override;
-
 };
 
 

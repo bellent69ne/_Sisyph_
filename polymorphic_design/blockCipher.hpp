@@ -1,5 +1,5 @@
-#ifndef BLOCK_CIPHER_HPP
-#define BLOCK_CIPHER_HPP
+#ifndef BLOCKCIPHER_HPP
+#define BLOCKCIPHER_HPP
 
 #include "symmetric.hpp"
 #include "secblock.h"
@@ -8,7 +8,7 @@
 #include <iostream>
 using namespace CryptoPP;
 
-class Block_Cipher: public Symmetric {
+class sisyph::BlockCipher: public sisyph::Symmetric {
 protected:
     SecByteBlock m_byteKey;
     std::string m_encIV;
@@ -29,7 +29,7 @@ public:
             >::value
         >
     >
-    explicit Block_Cipher(pathT&& fullPath, short keyLength,
+    explicit BlockCipher(pathT&& fullPath, short keyLength,
                           short blockSize):
             Symmetric(std::forward<pathT>(fullPath)),
             m_byteKey(keyLength),
@@ -80,7 +80,7 @@ public:
         return m_keyLength;
     }
 
-    virtual ~Block_Cipher(); 
+    virtual ~BlockCipher();
 
 };
 

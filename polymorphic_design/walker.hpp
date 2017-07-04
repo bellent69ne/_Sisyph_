@@ -10,7 +10,7 @@
 #include <array>
 #include <boost/filesystem.hpp>
 
-#include "cbctwofish.hpp"
+#include "twofish.hpp"
 
 
 using namespace boost::filesystem;
@@ -21,7 +21,7 @@ private:
     // Where we going to walk
     path m_walkThrough;
     // With whom we're going to walk
-    std::shared_ptr<Symmetric> m_walkWith;
+    std::shared_ptr<sisyph::Symmetric> m_walkWith;
     std::vector<std::string> m_cmdArgs;
     int m_pathStarts;
     std::array<std::string, 7> m_sysDirectories
@@ -34,7 +34,7 @@ public:
                 Walker,
                 std::decay_t<pathT>
             >::value && std::is_constructible<
-                Symmetric,
+                sisyph::Symmetric,
                 walkWithT
             >::value
         >
