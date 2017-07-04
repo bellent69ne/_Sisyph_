@@ -3,6 +3,9 @@
 
 #include "blockCipher.hpp"
 #include "shredder.hpp"
+#include "files.h"
+#include "modes.h"
+#include "rc6.h"
 
 class sisyph::RC6: public sisyph::BlockCipher {
 private:
@@ -20,7 +23,7 @@ private:
         typename = std::enable_if_t<
             std::is_constructible<
                 std::string,
-                std::decay_t<activityT>
+                std::decay_t<extensionT>
             >::value
         >
     >
@@ -33,7 +36,7 @@ private:
             */
             activityT blackOps;
 
-            //Set key and IV
+            // Set key and IV
             blackOps.SetKeyWithIV(
                 m_byteKey, m_byteKey.size(), m_byteIV
             );
@@ -69,7 +72,7 @@ private:
             );
         }
         catch(const CryptoPP::Exception& e) {
-            std::cerr << exception.what() << std::endl;
+            std::cerr << e.what() << std::endl;
         }
 
         m_shredder.shredFile(m_currentPath);
@@ -83,7 +86,7 @@ public:
        It should be straightforward. If it's not,
        refer to template metaprogramming on your search engine.
     */
-    template<typename pathT
+    template<typename pathT,
         typename = std::enable_if_t<
             !std::is_base_of<
                 sisyph::RC6,
@@ -115,11 +118,11 @@ public:
     virtual void generateIV() override;
 
     // getter for m_encKey. Simply returns encryption key in encoded hex format
-    virtual void getKey() noexcept override;
+    virtual std::string getKey() noexcept override;
 
     // setter for m_encKey. Sets new key from encoded hex format
     // Then decodes it to byte format
-    virtual void setKey(const std::string& newKey) override;
+    virtual void setKey(std::string& newKey) override;
 };
 
 #endif

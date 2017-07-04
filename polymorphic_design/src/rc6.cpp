@@ -1,4 +1,3 @@
-#include "osrng.h"
 #include "rc6.hpp"
 
 // Default constructed mode
@@ -62,7 +61,7 @@ void sisyph::RC6::generateIV() {
 /* Get the final key representation. It consists of hex encoded key
    appended with hex encoded IV
 */
-void sisyph::RC6::getKey() noexcept {
+std::string sisyph::RC6::getKey() noexcept {
     return m_encKey + m_encIV;
 }
 
@@ -70,6 +69,7 @@ void sisyph::RC6::getKey() noexcept {
    encoded IV, which represent the overall key, or, newKey is just a filename
    with sequence of concatenated encryption key and IV
 */
-void sisyph::RC6::setKey(const std::string& newKey) {
-    auto keyWithIV
+void sisyph::RC6::setKey(std::string& newKey) {
+    // process new key. Set both, key and IV.
+    processKey(newKey);
 }

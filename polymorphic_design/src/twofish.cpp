@@ -1,4 +1,3 @@
-#include "osrng.h"
 #include "twofish.hpp"
 
 // Default constructed mode,
