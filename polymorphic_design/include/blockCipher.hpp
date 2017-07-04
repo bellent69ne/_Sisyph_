@@ -13,8 +13,8 @@ protected:
     SecByteBlock m_byteKey;
     std::string m_encIV;
     byte *m_byteIV;
-    short m_blockSize;
-    short m_keyLength;
+    char m_blockSize;
+    char m_keyLength;
 
 public:
     template<typename pathT,
@@ -29,15 +29,13 @@ public:
             >::value
         >
     >
-    explicit BlockCipher(pathT&& fullPath, short keyLength,
-                          short blockSize):
+    explicit BlockCipher(pathT&& fullPath, char keyLength,
+                          char blockSize):
             Symmetric(std::forward<pathT>(fullPath)),
             m_byteKey(keyLength),
             m_encIV(""),
             m_byteIV(new byte[blockSize]),
             m_blockSize(blockSize) {
-                std::cout << "Key Length: " << keyLength << std::endl;
-                std::cout << "Block size: " << blockSize << std::endl;
     }
 
     virtual void generateIV() = 0;
@@ -76,9 +74,7 @@ public:
     }
 
 
-    inline virtual char keyLength() noexcept override {
-        return m_keyLength;
-    }
+    virtual char keyLength() noexcept override;
 
     virtual ~BlockCipher();
 

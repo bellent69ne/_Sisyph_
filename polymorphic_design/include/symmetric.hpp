@@ -80,12 +80,11 @@ public:
     }
 
     // get length of key
-    inline virtual char keyLength() noexcept = 0;
+    virtual char keyLength() noexcept = 0;
 
     // get current path on which we operate
-    inline virtual filesystem::path currentPath() noexcept {
-        return m_currentPath;
-    }
+    virtual filesystem::path currentPath() noexcept;
+
     // perfect forwards newPath to m_currentPath
     template<typename pathT,
         typename = std::enable_if_t<
@@ -103,9 +102,7 @@ public:
     virtual void generateKey() = 0;
 
     // getter for m_encKey
-    inline virtual std::string getKey() noexcept {
-        return m_encKey;
-    }
+    virtual std::string getKey() noexcept;
 
     // setter for m_encKey(copying newKey)
     virtual void setKey(const std::string& newKey) = 0;
@@ -113,14 +110,10 @@ public:
     //virtual void setKey(std::string&& newKey) = 0;
 
     // returns either will it encrypt or not
-    inline virtual bool willEncrypt() const noexcept {
-        return m_willEncrypt;
-    }
+    virtual bool willEncrypt() const noexcept;
 
     // sets either will it encrypt or not
-    inline virtual void willEncrypt(bool trueOrFalse) noexcept {
-        m_willEncrypt = trueOrFalse;
-    }
+    virtual void willEncrypt(bool trueOrFalse) noexcept;
 
     // compiler generated virtual default contructor
     virtual ~Symmetric() = default;

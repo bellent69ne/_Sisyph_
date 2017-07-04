@@ -12,7 +12,6 @@ sisyph::Twofish::Twofish():
                         m_loggedFiles("loggedFiles.dat") {
 }
 
-
 void sisyph::Twofish::encrypt() {
     if (m_currentPath.extension() == ".sisyph") {
         std::cerr << "Already encrypted... Skipping --------> "
@@ -59,6 +58,10 @@ void sisyph::Twofish::generateIV() {
             new StringSink(m_encIV)
         )
     );
+}
+
+std::string sisyph::Twofish::getKey() noexcept {
+    return m_encKey + m_encIV;
 }
 
 void sisyph::Twofish::setKey(const std::string& newKey) {

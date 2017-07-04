@@ -20,6 +20,7 @@ link_directories(/usr/lib)
 SET(
 	SOURCE_FILES
 	"${PROJECT_SOURCE_DIR}/polymorphic_design/src/main.cpp"
+	"${PROJECT_SOURCE_DIR}/polymorphic_design/src/symmetric.cpp"
 	"${PROJECT_SOURCE_DIR}/polymorphic_design/src/blockCipher.cpp"
 	"${PROJECT_SOURCE_DIR}/polymorphic_design/src/rc6.cpp"
 	"${PROJECT_SOURCE_DIR}/polymorphic_design/src/twofish.cpp"

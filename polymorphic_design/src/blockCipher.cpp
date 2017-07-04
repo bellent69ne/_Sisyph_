@@ -1,5 +1,9 @@
 #include "blockCipher.hpp"
 
+char sisyph::BlockCipher::keyLength() noexcept {
+    return m_keyLength;
+}
+
 sisyph::BlockCipher::~BlockCipher() {
     if(m_byteIV) {
         for(auto iii(0); iii < m_blockSize; ++iii)
