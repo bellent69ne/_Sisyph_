@@ -3,6 +3,8 @@
 
 #include "namespace_sisyph.hpp"
 #include <string>
+#include "osrng.h"
+#include "hex.h"
 #include <boost/filesystem.hpp>
 using namespace boost;
 
@@ -17,6 +19,30 @@ protected:
     std::string m_encKey;
     // either we're gonna encrypt or not
     bool m_willEncrypt;
+
+    /* Universal encryption key and initialization vector(IV)
+       generation method;
+       byteSequence is byte container either byte array or SecByteBlock,
+       sizeOfContainer is consequently the size of the passed byte container,
+       and decodeHere is the location where hex encoded data
+       have to be stored;
+    */
+    template<typename byteSequence>
+    void generate(byteSequence& byteContainer, const char sizeOfContainer,
+                  std::string& encodeHere) {
+        // Generate key or IV in bytes
+        CryptoPP::AutoSeededRandomPool prng;
+        prng.GenerateBlock(byteContainer, sizeOfContainer);
+
+        // Clear encodedHere to store there hex encoded key or IV representation
+        encodeHere.clear();
+        // Encode byte container(key or IV) into hex
+        CryptoPP::StringSource ssKey(byteContainer, sizeOfContainer, true,
+            new CryptoPP::HexEncoder(    // Hex encoder object
+                new CryptoPP::StringSink(encodeHere)    // Where it encodes that
+            )                                           // byte container
+        );
+    }
 
 public:
     /*  Perfect forwarding contructor. Used to construct our fields either
@@ -105,7 +131,7 @@ public:
     virtual std::string getKey() noexcept;
 
     // setter for m_encKey(copying newKey)
-    virtual void setKey(const std::string& newKey) = 0;
+    virtual void setKey(std::string& newKey) = 0;
 
     //virtual void setKey(std::string&& newKey) = 0;
 

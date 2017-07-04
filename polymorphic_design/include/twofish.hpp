@@ -79,7 +79,6 @@ private:
         m_shredder.shredFile(m_currentPath);
     }
 
-
 public:
     // Default construction
     Twofish();
@@ -124,7 +123,7 @@ public:
 
     // setter for m_encKey. Sets new key from encoded hex format
     // Then decodes it to byte format
-    virtual void setKey(const std::string& newKey) override;
+    virtual void setKey(std::string& newKey) override;
 };
 
 

@@ -4,7 +4,6 @@
 #include "symmetric.hpp"
 #include "secblock.h"
 #include "filters.h"
-#include "hex.h"
 #include <iostream>
 using namespace CryptoPP;
 
@@ -14,7 +13,9 @@ protected:
     std::string m_encIV;
     byte *m_byteIV;
     char m_blockSize;
-    char m_keyLength;
+    const char m_keyLength;
+
+    void processKey(std::string& newKey);
 
 public:
     template<typename pathT,
@@ -35,7 +36,8 @@ public:
             m_byteKey(keyLength),
             m_encIV(""),
             m_byteIV(new byte[blockSize]),
-            m_blockSize(blockSize) {
+            m_blockSize(blockSize),
+            m_keyLength(keyLength) {
     }
 
     virtual void generateIV() = 0;

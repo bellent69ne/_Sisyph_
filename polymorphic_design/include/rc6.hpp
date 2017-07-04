@@ -2,6 +2,7 @@
 #define RC6_HPP
 
 #include "blockCipher.hpp"
+#include "shredder.hpp"
 
 class sisyph::RC6: public sisyph::BlockCipher {
 private:
@@ -114,7 +115,7 @@ public:
     virtual void generateIV() override;
 
     // getter for m_encKey. Simply returns encryption key in encoded hex format
-    virtual void getKey() override;
+    virtual void getKey() noexcept override;
 
     // setter for m_encKey. Sets new key from encoded hex format
     // Then decodes it to byte format
