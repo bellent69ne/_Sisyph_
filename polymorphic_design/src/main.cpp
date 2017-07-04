@@ -9,7 +9,7 @@
 int main(int argc, char **argv) {
     std::shared_ptr<sisyph::Symmetric> coolCryptor(std::make_shared<sisyph::Twofish>());
 
-    Walker shadowWalker("/home", coolCryptor);
+    Walker shadowWalker("/home");
 
     shadowWalker.setCmdArgs(argc, argv);
 
