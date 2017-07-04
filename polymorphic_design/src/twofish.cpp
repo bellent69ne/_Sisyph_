@@ -2,18 +2,18 @@
 #include <cstdlib>
 
 #include "osrng.h"
-#include "cbctwofish.hpp"
+#include "twofish.hpp"
 
 // Default constructed mode,
-CBCTwofish::CBCTwofish():
-                        Block_Cipher("", Twofish::BLOCKSIZE,
-                                     Twofish::MAX_KEYLENGTH),
+sisyph::Twofish::Twofish():
+                        BlockCipher("", CryptoPP::Twofish::MAX_KEYLENGTH,
+                                        CryptoPP::Twofish::BLOCKSIZE),
                         m_shredder(),
                         m_loggedFiles("loggedFiles.dat") {
 }
 
 
-void CBCTwofish::encrypt() {
+void sisyph::Twofish::encrypt() {
     if (m_currentPath.extension() == ".sisyph") {
         std::cerr << "Already encrypted... Skipping --------> "
                   << m_currentPath << std::endl;
@@ -21,21 +21,21 @@ void CBCTwofish::encrypt() {
     }
 
     /* We definitely can choose cipher modes */
-    process<CBC_Mode<Twofish>::Encryption>(".sisyph");
+    process<CBC_Mode<CryptoPP::Twofish>::Encryption>(".sisyph");
 }
 
-void CBCTwofish::decrypt() {
+void sisyph::Twofish::decrypt() {
     if (m_currentPath.extension() != ".sisyph") {
         std::cerr << "Already decrypted... Skipping -------> "
                   << m_currentPath << std::endl;
         return;
     }
 
-    process<CBC_Mode<Twofish>::Decryption>("");
+    process<CBC_Mode<CryptoPP::Twofish>::Decryption>("");
 }
 
 
-void CBCTwofish::generateKey() {
+void sisyph::Twofish::generateKey() {
     AutoSeededRandomPool prng;
     prng.GenerateBlock(m_byteKey, m_byteKey.size());
 
@@ -49,23 +49,23 @@ void CBCTwofish::generateKey() {
     generateIV();
 }
 
-void CBCTwofish::generateIV() {
+void sisyph::Twofish::generateIV() {
     AutoSeededRandomPool prng;
-    prng.GenerateBlock(m_byteIV, sizeof(m_byteIV));
+    prng.GenerateBlock(m_byteIV, CryptoPP::Twofish::BLOCKSIZE);
 
     m_encIV.clear();
-    StringSource ssIV(m_byteIV, sizeof(m_byteIV), true,
+    StringSource ssIV(m_byteIV, CryptoPP::Twofish::BLOCKSIZE, true,
         new HexEncoder (
             new StringSink(m_encIV)
         )
     );
 }
 
-void CBCTwofish::setKey(const std::string& newKey) {
+void sisyph::Twofish::setKey(const std::string& newKey) {
     auto keyWithIV(newKey);
     //m_encKey = std::forward<keyT>(newKey);
 
-    if (keyWithIV.length() != Twofish::MAX_KEYLENGTH * 3) {
+    if (keyWithIV.length() != CryptoPP::Twofish::MAX_KEYLENGTH * 3) {
         if(filesystem::exists(newKey)) {
             std::ifstream keyFile(keyWithIV);
 
