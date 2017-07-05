@@ -200,18 +200,18 @@ public:
 
             // Now just determine the cryptographic algorithm
             // if it's Twofish, allocate sisyph::Twofish cryptographic object
-            if(m_cmdArgs.at(filePathsStart - 2) == "TWOFISH")
-                m_walkWith.reset(new sisyph::Twofish);
+            if(m_cmdArgs.at(filePathsStart - 3) == "TWOFISH")
+                m_walkWith.reset(new sisyph::Twofish(m_cmdArgs.at(filePathsStart - 2)));
             // if it's RC6, then allocate sisyph::RC6 cryptographic object
-            else if(m_cmdArgs.at(filePathsStart - 2) == "RC6")
-                m_walkWith.reset(new sisyph::RC6);
+            else if(m_cmdArgs.at(filePathsStart - 3) == "RC6")
+                m_walkWith.reset(new sisyph::RC6(m_cmdArgs.at(filePathsStart - 2)));
             // if nothing of these, then show usage message and exit
             else
                 usage();
-            
+
             // Set either we're gonna encrypt or not(--enc means encrypt)
             m_walkWith->willEncrypt(
-                operation(m_cmdArgs.at(filePathsStart - 3))
+                operation(m_cmdArgs.at(filePathsStart - 4))
             );
 
 

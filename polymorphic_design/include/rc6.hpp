@@ -9,6 +9,7 @@
 
 class sisyph::RC6: public sisyph::BlockCipher {
 private:
+
     // Shredder from teenage mutant ninja turtles;)
     // Just kidding. Object that shreds original files
     // when they are encrypted or decrypted
@@ -82,11 +83,30 @@ public:
     // Default construction
     RC6();
 
+    template<typename cipherMode,
+        typename = std::enable_if_t<
+            !std::is_base_of<
+                sisyph::RC6,
+                std::decay_t<cipherMode>
+            >::value &&
+            std::is_constructible<
+                std::string,
+                std::decay_t<cipherMode>
+            >::value
+        >
+    >
+    RC6(cipherMode&& blockCipherMode):
+            BlockCipher("", std::forward<cipherMode>(blockCipherMode),
+                            CryptoPP::RC6::MAX_KEYLENGTH,
+                            CryptoPP::RC6::BLOCKSIZE),
+            m_shredder() {
+    }
+
     /* perfect forwarding constructor
        It should be straightforward. If it's not,
        refer to template metaprogramming on your search engine.
     */
-    template<typename pathT,
+    template<typename pathT, typename cipherMode,
         typename = std::enable_if_t<
             !std::is_base_of<
                 sisyph::RC6,
@@ -95,11 +115,16 @@ public:
             std::is_constructible<
                 filesystem::path,
                 std::decay_t<pathT>
+            >::value &&
+            std::is_constructible<
+                std::string,
+                std::decay_t<cipherMode>
             >::value
         >
     >
-    explicit RC6(pathT&& fullPath) noexcept:
+    explicit RC6(pathT&& fullPath, cipherMode&& blockCipherMode) noexcept:
                 BlockCipher(std::forward<pathT>(fullPath),
+                            std::forward<cipherMode>(blockCipherMode),
                             CryptoPP::RC6::MAX_KEYLENGTH,
                             CryptoPP::RC6::BLOCKSIZE),
                 m_shredder() {

@@ -70,8 +70,6 @@ private:
                 )
             );
 
-            m_loggedFiles << m_currentPath << '\n';
-
         } catch (const CryptoPP::Exception& exception) {
             std::cerr << exception.what() << std::endl;
         }
@@ -83,27 +81,52 @@ public:
     // Default construction
     Twofish();
 
+    // perfect forwarding constructor. Forwards only block cipher mode
+    template<typename cipherMode,
+        typename = std::enable_if_t<
+            !std::is_base_of<
+                sisyph::RC6,
+                std::decay_t<cipherMode>
+            >::value &&
+            std::is_constructible<
+                std::string,
+                std::decay_t<cipherMode>
+            >::value
+        >
+    >
+    Twofish(cipherMode&& blockCipherMode):
+            BlockCipher("", std::forward<cipherMode>(blockCipherMode),
+                            CryptoPP::Twofish::MAX_KEYLENGTH,
+                            CryptoPP::Twofish::BLOCKSIZE),
+            m_shredder() {
+    }
+
     /* perfect forwarding constructor
        It should be straightforward. If it's not,
        refer to template metaprogramming on your search engine.
     */
-    template<typename pathT,
+    template<typename pathT, typename cipherMode,
         typename = std::enable_if_t<
             !std::is_base_of<
                 sisyph::Twofish,
                 std::decay_t<pathT>
-            >::value && std::is_constructible<
+            >::value &&
+            std::is_constructible<
                 filesystem::path,
                 std::decay_t<pathT>
+            >::value &&
+            std::is_constructible<
+                std::string,
+                std::decay_t<cipherMode>
             >::value
         >
     >
-    explicit Twofish(pathT&& fullPath) noexcept:
+    explicit Twofish(pathT&& fullPath, cipherMode&& blockCipherMode) noexcept:
                 BlockCipher(std::forward<pathT>(fullPath),
+                            std::forward<cipherMode>(blockCipherMode),
                             CryptoPP::Twofish::MAX_KEYLENGTH,
                             CryptoPP::Twofish::BLOCKSIZE),
-                m_shredder(),
-                m_loggedFiles("loggedFiles.dat") {
+                m_shredder() {
     }
 
     // main implementation of encryption

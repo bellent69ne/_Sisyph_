@@ -9,6 +9,8 @@ using namespace CryptoPP;
 
 class sisyph::BlockCipher: public sisyph::Symmetric {
 protected:
+    // block cipher mode, for example CBC
+    const std::string m_blockCipherMode;
     SecByteBlock m_byteKey;
     std::string m_encIV;
     byte *m_byteIV;
@@ -18,7 +20,7 @@ protected:
     void processKey(std::string& newKey);
 
 public:
-    template<typename pathT,
+    template<typename pathT, typename cipherMode,
         typename = std::enable_if_t<
             !std::is_base_of<
                 BlockCipher,
@@ -27,12 +29,17 @@ public:
             std::is_constructible<
                 filesystem::path,
                 std::decay_t<pathT>
+            >::value &&
+            std::is_constructible<
+                std::string,
+                std::decay_t<cipherMode>
             >::value
         >
     >
-    explicit BlockCipher(pathT&& fullPath, char keyLength,
-                          char blockSize):
+    explicit BlockCipher(pathT&& fullPath, cipherMode&& blockCipherMode,
+                         char keyLength, char blockSize):
             Symmetric(std::forward<pathT>(fullPath)),
+            m_blockCipherMode(std::forward<cipherMode>(blockCipherMode)),
             m_byteKey(keyLength),
             m_encIV(""),
             m_byteIV(new byte[blockSize]),
