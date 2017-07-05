@@ -139,7 +139,7 @@ public:
     virtual bool willEncrypt() const noexcept;
 
     // sets either will it encrypt or not
-    virtual void willEncrypt(bool trueOrFalse) noexcept;
+    virtual void willEncrypt(const bool trueOrFalse) noexcept;
 
     // compiler generated virtual default contructor
     virtual ~Symmetric() = default;

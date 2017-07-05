@@ -9,6 +9,10 @@ void Walker::walk() {
         exit(1);
     }
 
+    // We need to save our encryption key some where
+    std::ofstream saveKey("key.dat");
+    saveKey << m_walkWith->getKey();
+
     auto whatRWeDoing(static_cast<std::string>(""));
     m_walkWith->willEncrypt() ?
             whatRWeDoing = "Encrypting ---------------------------> " :
@@ -23,7 +27,7 @@ void Walker::walk() {
                     m_walkThrough = fs::current_path() / *pathToArg;
 
             /*Checking for system directories(for example "/proc")*/
-            auto inSysDir([&m_sysDirectories = m_sysDirectories](auto&& somePath) {
+            /*auto inSysDir([&m_sysDirectories = m_sysDirectories](auto&& somePath) {
                 auto afterSlash(somePath.begin());
                 ++afterSlash;
 
@@ -32,7 +36,7 @@ void Walker::walk() {
                         return true;
 
                 return false;
-            });
+            });*/
 
             if (fs::is_regular_file(m_walkThrough)) {
                 std::cout << whatRWeDoing
