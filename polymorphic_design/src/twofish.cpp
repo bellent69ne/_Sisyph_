@@ -4,8 +4,7 @@
 sisyph::Twofish::Twofish():
                         BlockCipher("", "CBC",
                                         CryptoPP::Twofish::MAX_KEYLENGTH,
-                                        CryptoPP::Twofish::BLOCKSIZE),
-                        m_shredder() {
+                                        CryptoPP::Twofish::BLOCKSIZE) {
 }
 
 // Decryption implementation
@@ -70,13 +69,13 @@ void sisyph::Twofish::decrypt() {
        We can even choose block cipher modes, that will be implemented soon.
     */
     if(m_blockCipherMode == "CBC")
-        process<CBC_Mode<CryptoPP::Twofish>::Decryption>(".sisyph");
+        process<CBC_Mode<CryptoPP::Twofish>::Decryption>("");
     // if m_blockCipherMode is ECB, process it with ECB cipher mode
     else if(m_blockCipherMode == "ECB")
-        process<ECB_Mode<CryptoPP::Twofish>::Decryption>(".sisyph");
+        process<ECB_Mode<CryptoPP::Twofish>::Decryption>("");
     // if m_blockCipherMode is CTR, process it with CTR cipher mode
     else if(m_blockCipherMode == "CTR")
-        process<CTR_Mode<CryptoPP::Twofish>::Decryption>(".sisyph");
+        process<CTR_Mode<CryptoPP::Twofish>::Decryption>("");
     // Following are authenticated Decryption schemes
     // if m_blockCipherMode is GCM, process it with GCM cipher mode
     /*else if(m_blockCipherMode == "GCM")

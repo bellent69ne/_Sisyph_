@@ -1,82 +1,11 @@
 #ifndef TWOFISH_HPP
 #define TWOFISH_HPP
 
-#include <fstream>
 #include "blockCipher.hpp"
 #include "twofish.h"
-#include "files.h"
 #include "modes.h"
-#include "shredder.hpp"
-
 
 class sisyph::Twofish: public sisyph::BlockCipher {
-private:
-    // Shredder from teenage mutant ninja turtles;)
-    // Just kidding. Object that shreds original files
-    // when they are encrypted or decrypted
-    Shredder m_shredder;
-    std::ofstream m_loggedFiles;
-
-    template<typename activityT, typename extensionT,
-        typename = std::enable_if_t<
-            std::is_constructible<
-                std::string,
-                std::decay_t<extensionT>
-            >::value
-        >
-    >
-    void process(extensionT&& fileExtension) {
-        try {
-            /* activityT will decide what kind of operation
-               will be performed.
-               For example CBC_Mode<CryptoPP::Twofish>::Encryption for encryption.
-               Look at encrypt() method.
-            */
-            activityT blackOps;
-
-            // Set key and IV
-            blackOps.SetKeyWithIV(
-                m_byteKey, m_byteKey.size(), m_byteIV
-            );
-
-            /* extenstionT could possibly be anything which contain characters.
-               Make sure we're dealing with string. fileExtension
-               is just an extension of the file which will be produced
-               while processing original file. If encryption, fileExtension
-               will hold ".sisyph" which marks that this file is encrypted
-            */
-            auto fileExt(
-                static_cast<std::string>(
-                    std::forward<extensionT>(fileExtension)
-                )
-            );
-
-            // sink file is the file which will hold encrypted data
-            auto sinkFile(m_currentPath);
-
-            // if we passed empty extenstion, that means that we don't want
-            // encrypt that file(decryption will be performed).
-            if (fileExt.empty()) {
-                sinkFile.replace_extension("");
-            }
-
-            // Process file
-            FileSource file(
-                m_currentPath.generic_string().c_str(), true,
-                new StreamTransformationFilter(blackOps,
-                    new FileSink((sinkFile.generic_string()
-                                  + fileExt).c_str()
-                    )
-                )
-            );
-
-        } catch (const CryptoPP::Exception& exception) {
-            std::cerr << exception.what() << std::endl;
-        }
-
-        m_shredder.shredFile(m_currentPath);
-    }
-
 public:
     // Default construction
     Twofish();
@@ -97,8 +26,7 @@ public:
     Twofish(cipherMode&& blockCipherMode):
             BlockCipher("", std::forward<cipherMode>(blockCipherMode),
                             CryptoPP::Twofish::MAX_KEYLENGTH,
-                            CryptoPP::Twofish::BLOCKSIZE),
-            m_shredder() {
+                            CryptoPP::Twofish::BLOCKSIZE) {
     }
 
     /* perfect forwarding constructor
@@ -125,8 +53,7 @@ public:
                 BlockCipher(std::forward<pathT>(fullPath),
                             std::forward<cipherMode>(blockCipherMode),
                             CryptoPP::Twofish::MAX_KEYLENGTH,
-                            CryptoPP::Twofish::BLOCKSIZE),
-                m_shredder() {
+                            CryptoPP::Twofish::BLOCKSIZE) {
     }
 
     // main implementation of encryption

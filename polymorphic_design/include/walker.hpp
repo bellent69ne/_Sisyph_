@@ -149,7 +149,7 @@ public:
             // if it's neither encryption nor decryption,
             // better look at the usage message
             std::cerr << "Usage: ./sisyph -r(optional) "
-                         "--encrypt --keyGen /path"
+                         "--enc ALGORITHM --keyGen /path"
                       << std::endl;
             exit(-1);
         });
@@ -194,7 +194,7 @@ public:
                 So if we want to walk recursively, then filePathsStart is equal
                 to 5, otherwise it's equal to 4(without -r option)
             */
-            isRecursive() ? filePathsStart = 5 : filePathsStart = 4;
+            isRecursive() ? filePathsStart = 6 : filePathsStart = 5;
             // copy that to our class private field m_pathStarts;
             m_pathStarts = filePathsStart;
 
@@ -229,7 +229,7 @@ public:
 
     inline void usage() {
         std::cerr << "Usage: ./sisyph -r(optional)"
-                     " --encrypt --Twofish --keyGen /path"
+                     " --enc ALGORITHM --keyGen /path"
                   << std::endl;
         exit(-1);
     }
