@@ -25,8 +25,9 @@ protected:
     //const std::string m_blockCipherMode;
     SecByteBlock m_byteKey;
     std::string m_encIV;
-    byte *m_byteIV;
-    char m_blockSize;
+    //byte *m_byteIV;
+    SecByteBlock m_byteIV;
+    //char m_blockSize;
     const char m_keyLength;
     // Shredder from teenage mutant ninja turtles;)
     // Just kidding. Object that shreds original files
@@ -120,7 +121,7 @@ protected:
             // Set key and IV
             // Possibly doesn't work properly with EAX mode
             blackOps.SetKeyWithIV(m_byteKey, m_byteKey.size(),
-                                  m_byteIV, m_blockSize);
+                                  m_byteIV, m_byteIV.size());
 
             // sink file is the file which will hold encrypted data
             auto sinkFile(m_currentPath);
@@ -189,8 +190,8 @@ public:
             },
             m_byteKey(keyLength),
             m_encIV(""),
-            m_byteIV(new byte[blockSize]),
-            m_blockSize(blockSize),
+            m_byteIV(blockSize),
+            //m_blockSize(blockSize),
             m_keyLength(keyLength),
             m_shredder() {
         if(m_blockCipherModes.find(blockCipherMode) !=
@@ -236,7 +237,7 @@ public:
 
     virtual char keyLength() noexcept override;
 
-    virtual ~BlockCipher();
+    virtual ~BlockCipher() = default;
 
 };
 

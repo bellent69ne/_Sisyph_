@@ -54,7 +54,7 @@ void sisyph::BlockCipher::processKey(std::string& newKey) {
         }
     }
     // Well, if it's not a file, then it's definitely the key sequence itself
-    m_encKey.assign(keyWithIV.cbegin(), keyWithIV.cend() - 32);
+    m_encKey.assign(keyWithIV.cbegin(), keyWithIV.cbegin() + 64);
 
     // create a storage to store our secret key in decoded format
     // (in bytes)
@@ -69,10 +69,14 @@ void sisyph::BlockCipher::processKey(std::string& newKey) {
     // convert it into bytes, and store that byte sequence in m_byteKey
     m_byteKey.Assign((byte*) decodedKey.data(), decodedKey.size());
 
-    // now just do the same thing with IV. Store only IV sequence in keyWithIV
-    keyWithIV.assign(keyWithIV.cend() - 32, keyWithIV.cend());
-    // move it to setIV in order to generate IV
-    setIV(std::move(keyWithIV));
+    // ECB mode doesn't use IV, we want to setIV only if our mode of operation
+    // needs IV, but for ECB, we don't want to set it
+    if(!m_blockCipherModes["ECB"]) {
+        // now just do the same thing with IV. Store only IV sequence in keyWithIV
+        keyWithIV.assign(keyWithIV.cend() - 32, keyWithIV.cend());
+        // move it to setIV in order to generate IV
+        setIV(std::move(keyWithIV));
+    }
 }
 
 // get the length of encryption key
@@ -81,7 +85,7 @@ char sisyph::BlockCipher::keyLength() noexcept {
 }
 
 // Destroy BlockCipher object
-sisyph::BlockCipher::~BlockCipher() {
+/*sisyph::BlockCipher::~BlockCipher() {
     // if we have a byte sequence of IV in heap
     if(m_byteIV) {
         // we definitely want to zeroize it, to erase potential IV leak
@@ -91,4 +95,4 @@ sisyph::BlockCipher::~BlockCipher() {
         delete[] m_byteIV;
         m_byteIV = nullptr;
     }
-}
+}*/
