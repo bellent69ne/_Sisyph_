@@ -3,7 +3,6 @@
 
 #include "blockCipher.hpp"
 #include "rc6.h"
-#include "modes.h"
 
 class sisyph::RC6: public sisyph::BlockCipher {
 public:

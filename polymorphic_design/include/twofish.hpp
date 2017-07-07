@@ -3,7 +3,6 @@
 
 #include "blockCipher.hpp"
 #include "twofish.h"
-#include "modes.h"
 
 class sisyph::Twofish: public sisyph::BlockCipher {
 public:

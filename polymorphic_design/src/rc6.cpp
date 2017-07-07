@@ -21,27 +21,27 @@ void sisyph::RC6::encrypt() {
     /* process file. Passing encryption template type parameter.
        We can even choose block cipher modes, that will be implemented soon.
     */
-    if(m_blockCipherMode == "CBC")
-        process<CBC_Mode<CryptoPP::RC6>::Encryption>(".sisyph");
-    // if m_blockCipherMode is ECB, process it with ECB cipher mode
-    else if(m_blockCipherMode == "ECB")
-        process<ECB_Mode<CryptoPP::RC6>::Encryption>(".sisyph");
-    // if m_blockCipherMode is CTR, process it with CTR cipher mode
-    else if(m_blockCipherMode == "CTR")
-        process<CTR_Mode<CryptoPP::RC6>::Encryption>(".sisyph");
+    if(m_blockCipherModes["CBC"])
+        process<CBC_Mode<CryptoPP::RC6>::Encryption>(true);
+    // if m_blockCipherModes is ECB, process it with ECB cipher mode
+    else if(m_blockCipherModes["ECB"])
+        process<ECB_Mode<CryptoPP::RC6>::Encryption>(true);
+    // if m_blockCipherModes is CTR, process it with CTR cipher mode
+    else if(m_blockCipherModes["CTR"])
+        process<CTR_Mode<CryptoPP::RC6>::Encryption>(true);
     // Following are authenticated encryption schemes
-    // if m_blockCipherMode is GCM, process it with GCM cipher mode
-    /*else if(m_blockCipherMode == "GCM")
-        process<GCM<CryptoPP::RC6>::Encryption>(".sisyph");
-    // if m_blockCipherMode is CCM, process it with CCM cipher mode
-    else if(m_blockCipherMode == "CCM")
-        process<CCM<CryptoPP::RC6>::Encryption>(".sisyph");
-    // if m_blockCipherMode is EAX, process it with EAX cipher mode
-    else if(m_blockCipherMode == "EAX")
-        process<EAX<CryptoPP::RC6>::Encryption>(".sisyph");*/
+    // if m_blockCipherModes is GCM, process it with GCM cipher mode
+    else if(m_blockCipherModes["GCM"])
+        processAuthentic<GCM<CryptoPP::RC6>::Encryption>(true);
+    // if m_blockCipherModes is CCM, process it with CCM cipher mode
+    //else if(m_blockCipherModes == "CCM")
+    //    process<CCM<CryptoPP::RC6>::Encryption>(".sisyph");
+    // if m_blockCipherModes is EAX, process it with EAX cipher mode
+    else if(m_blockCipherModes["EAX"])
+        processAuthentic<EAX<CryptoPP::RC6>::Encryption>(true);
 
     else {
-        std::cerr << m_blockCipherMode << " block cipher mode doesn't exist\n";
+        std::cerr << "Block cipher mode doesn't exist\n";
         exit(-1);
     }
 }
@@ -62,27 +62,27 @@ void sisyph::RC6::decrypt() {
        just like above.
        We can even choose block cipher modes, that will be implemented soon.
     */
-    if(m_blockCipherMode == "CBC")
-        process<CBC_Mode<CryptoPP::RC6>::Decryption>("");
-    // if m_blockCipherMode is ECB, process it with ECB cipher mode
-    else if(m_blockCipherMode == "ECB")
-        process<ECB_Mode<CryptoPP::RC6>::Decryption>("");
-    // if m_blockCipherMode is CTR, process it with CTR cipher mode
-    else if(m_blockCipherMode == "CTR")
-        process<CTR_Mode<CryptoPP::RC6>::Decryption>("");
+    if(m_blockCipherModes["CBC"])
+        process<CBC_Mode<CryptoPP::RC6>::Decryption>(false);
+    // if m_blockCipherModes is ECB, process it with ECB cipher mode
+    else if(m_blockCipherModes["ECB"])
+        process<ECB_Mode<CryptoPP::RC6>::Decryption>(false);
+    // if m_blockCipherModes is CTR, process it with CTR cipher mode
+    else if(m_blockCipherModes["CTR"])
+        process<CTR_Mode<CryptoPP::RC6>::Decryption>(false);
     // Following are authenticated Decryption schemes
-    // if m_blockCipherMode is GCM, process it with GCM cipher mode
-    /*else if(m_blockCipherMode == "GCM")
-        process<GCM<CryptoPP::RC6>::Decryption>(".sisyph");
-    // if m_blockCipherMode is CCM, process it with CCM cipher mode
-    else if(m_blockCipherMode == "CCM")
-        process<CCM<CryptoPP::RC6>::Decryption>(".sisyph");
-    // if m_blockCipherMode is EAX, process it with EAX cipher mode
-    else if(m_blockCipherMode == "EAX")
-        process<EAX<CryptoPP::RC6>::Decryption>(".sisyph");
-*/
+    // if m_blockCipherModes is GCM, process it with GCM cipher mode
+    else if(m_blockCipherModes["GCM"])
+        processAuthentic<GCM<CryptoPP::RC6>::Decryption>(false);
+//    // if m_blockCipherModes is CCM, process it with CCM cipher mode
+//    else if(m_blockCipherModes == "CCM")
+//        process<CCM<CryptoPP::RC6>::Decryption>(".sisyph");
+    // if m_blockCipherModes is EAX, process it with EAX cipher mode
+    else if(m_blockCipherModes["EAX"])
+        processAuthentic<EAX<CryptoPP::RC6>::Decryption>(false);
+
     else {
-        std::cerr << m_blockCipherMode << " block cipher mode doesn't exist\n";
+        std::cerr << "Block cipher mode doesn't exist\n";
         exit(-1);
     }
 }
@@ -93,7 +93,9 @@ void sisyph::RC6::generateKey() {
     generate(m_byteKey, m_byteKey.size(), m_encKey);
 
     // Now we've gotta generate initialization vector(IV), it's important
-    generateIV();
+    // if we're processing data in ECB mode, then we don't need IV
+    if(!m_blockCipherModes["ECB"])
+        generateIV();
 }
 
 // initialization vector(IV) generation. Both hex encoded and decoded(in bytes);
@@ -106,6 +108,9 @@ void sisyph::RC6::generateIV() {
    appended with hex encoded IV
 */
 std::string sisyph::RC6::getKey() noexcept {
+    // ECB mode doesn't use IV, so we don't need it if ECB mode enabled
+    if(m_blockCipherModes["ECB"])
+        return m_encKey;
     return m_encKey + m_encIV;
 }
 

