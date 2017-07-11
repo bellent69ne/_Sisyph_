@@ -1,20 +1,21 @@
-#include "rc6.hpp"
+#include "aes.hpp"
 
 // Default constructed mode
-sisyph::RC6::RC6():
+sisyph::AES::AES():
             BlockCipher(
                 "",
                 "CBC",
-                CryptoPP::RC6::MAX_KEYLENGTH,
-                CryptoPP::RC6::BLOCKSIZE
+                CryptoPP::AES::MAX_KEYLENGTH,
+                CryptoPP::AES::BLOCKSIZE
             ) {
 }
 
 // encryption implementation
-void sisyph::RC6::encrypt() {
-    /* if extension of the processing file is .sisyph,
-     skip it, cause that means that it is encrypted.
-     We don't want to encrypt file twice
+void sisyph::AES::encrypt() {
+    /*
+        if extension of the processing file is .sisyph,
+        skit it, cause that means that it is encrypted.
+        We don't want to encrypt file twice
     */
     if(m_currentPath.extension() == ".sisyph") {
         std::cerr << "Already encrypted... Skipping --------> "
@@ -22,29 +23,28 @@ void sisyph::RC6::encrypt() {
         return;
     }
 
-    /* process file. Passing encryption template type parameter.
-       Template type parameter specifies the kind of the operation,
-       and block cipher mode of operation.
+    /*
+        process file. Passing encryption template type parameter.
+        Template type parameter specifies the kind of the operation,
+        and block cipher mode of operation.
     */
     if(m_blockCipherModes["CBC"])
-        process<CBC_Mode<CryptoPP::RC6>::Encryption>(true);
+        process<CBC_Mode<CryptoPP::AES>::Encryption>(true);
     // if m_blockCipherModes is ECB, process it with ECB cipher mode
     // ECB is not recommended. Supported just optionally
     else if(m_blockCipherModes["ECB"])
-        process<ECB_Mode<CryptoPP::RC6>::Encryption>(true);
-    // if m_blockCipherModes is CTR, process it with CTR cipher mode
+        process<ECB_Mode<CryptoPP::AES>::Encryption>(true);
+    // if m_blockCipherModesis CTR, process it with CTR cipher mode
     else if(m_blockCipherModes["CTR"])
-        process<CTR_Mode<CryptoPP::RC6>::Encryption>(true);
+        process<CTR_Mode<CryptoPP::AES>::Encryption>(true);
     // Following are authenticated encryption schemes
     // if m_blockCipherModes is GCM, process it with GCM cipher mode
     else if(m_blockCipherModes["GCM"])
-        processAuthentic<GCM<CryptoPP::RC6>::Encryption>(true);
-    // if m_blockCipherModes is CCM, process it with CCM cipher mode
-    //else if(m_blockCipherModes == "CCM")
-    //    process<CCM<CryptoPP::RC6>::Encryption>(".sisyph");
+        processAuthentic<GCM<CryptoPP::AES>::Encryption>(true);
+    // CCM is not supported for now
     // if m_blockCipherModes is EAX, process it with EAX cipher mode
     else if(m_blockCipherModes["EAX"])
-        processAuthentic<EAX<CryptoPP::RC6>::Encryption>(true);
+        processAuthentic<EAX<CryptoPP::AES>::Encryption>(true);
 
     else {
         std::cerr << "Block cipher mode doesn't exist\n";
@@ -53,40 +53,41 @@ void sisyph::RC6::encrypt() {
 }
 
 // decryption implementation
-void sisyph::RC6::decrypt() {
-    /* if extenstion of the processing file is not .sisyph
-     skip it, cause we that means that it is decrypted.
-     We don't want to decrypt file twice
+void sisyph::AES::decrypt() {
+    /*
+        if extenstion of the processing file is not .sisyph
+        skip it, cause we that means that it is decrypted.
+        We don't want to decrypt file twice
     */
     if(m_currentPath.extension() != ".sisyph") {
-        std::cerr << "Already decrypted... Skipping -------> "
+        std::cerr << "Already decrypted... Skipping --------> "
                   << m_currentPath.generic_string() << std::endl;
         return;
     }
 
     /*
-        process file. Passing encryption template type parameter.
+        process file. Passing decryption template type parameter.
         Template type parameter specifies the kind of the operation,
-        and blocm cipher mode of operation.
+        and block cipher mode of operation.
     */
     if(m_blockCipherModes["CBC"])
-        process<CBC_Mode<CryptoPP::RC6>::Decryption>(false);
+        process<CBC_Mode<CryptoPP::AES>::Decryption>(false);
     // if m_blockCipherModes is ECB, process it with ECB cipher mode
     else if(m_blockCipherModes["ECB"])
-        process<ECB_Mode<CryptoPP::RC6>::Decryption>(false);
+        process<ECB_Mode<CryptoPP::AES>::Decryption>(false);
     // if m_blockCipherModes is CTR, process it with CTR cipher mode
     else if(m_blockCipherModes["CTR"])
-        process<CTR_Mode<CryptoPP::RC6>::Decryption>(false);
+        process<CTR_Mode<CryptoPP::AES>::Decryption>(false);
     // Following are authenticated Decryption schemes
     // if m_blockCipherModes is GCM, process it with GCM cipher mode
     else if(m_blockCipherModes["GCM"])
-        processAuthentic<GCM<CryptoPP::RC6>::Decryption>(false);
+        processAuthentic<GCM<CryptoPP::AES>::Decryption>(false);
 //    // if m_blockCipherModes is CCM, process it with CCM cipher mode
 //    else if(m_blockCipherModes == "CCM")
-//        process<CCM<CryptoPP::RC6>::Decryption>(".sisyph");
+//        process<CCM<CryptoPP::AES>::Decryption>(".sisyph");
     // if m_blockCipherModes is EAX, process it with EAX cipher mode
     else if(m_blockCipherModes["EAX"])
-        processAuthentic<EAX<CryptoPP::RC6>::Decryption>(false);
+        processAuthentic<EAX<CryptoPP::AES>::Decryption>(false);
 
     else {
         std::cerr << "Block cipher mode doesn't exist\n";
@@ -94,8 +95,7 @@ void sisyph::RC6::decrypt() {
     }
 }
 
-// encryption key generation. Both hex encoded and decoded(in bytes);
-void sisyph::RC6::generateKey() {
+void sisyph::AES::generateKey() {
     // Generate encryption key
     generate(m_byteKey, m_byteKey.size(), m_encKey);
 
@@ -106,7 +106,7 @@ void sisyph::RC6::generateKey() {
 }
 
 // initialization vector(IV) generation. Both hex encoded and decoded(in bytes);
-void sisyph::RC6::generateIV() {
+void sisyph::AES::generateIV() {
     // Generate initialization vector(IV)
     generate(m_byteIV, m_byteIV.size(), m_encIV);
 }
@@ -114,7 +114,7 @@ void sisyph::RC6::generateIV() {
 /* Get the final key representation. It consists of hex encoded key
    appended with hex encoded IV
 */
-std::string sisyph::RC6::getKey() noexcept {
+std::string sisyph::AES::getKey() noexcept {
     // ECB mode doesn't use IV, so we don't need it if ECB mode enabled
     if(m_blockCipherModes["ECB"])
         return m_encKey;
@@ -125,7 +125,7 @@ std::string sisyph::RC6::getKey() noexcept {
    encoded IV, which represent the overall key, or, newKey is just a filename
    with sequence of concatenated encryption key and IV
 */
-void sisyph::RC6::setKey(std::string& newKey) {
+void sisyph::AES::setKey(std::string& newKey) {
     // process new key. Set both, key and IV.
     processKey(newKey);
 }

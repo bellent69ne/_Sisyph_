@@ -12,6 +12,8 @@
 
 #include "twofish.hpp"
 #include "rc6.hpp"
+#include "aes.hpp"
+#include "serpent.hpp"
 
 
 using namespace boost::filesystem;
@@ -201,10 +203,32 @@ public:
             // Now just determine the cryptographic algorithm
             // if it's Twofish, allocate sisyph::Twofish cryptographic object
             if(m_cmdArgs.at(filePathsStart - 3) == "TWOFISH")
-                m_walkWith.reset(new sisyph::Twofish(m_cmdArgs.at(filePathsStart - 2)));
+                m_walkWith.reset(
+                    new sisyph::Twofish(
+                        m_cmdArgs.at(filePathsStart - 2)
+                    )
+                );
             // if it's RC6, then allocate sisyph::RC6 cryptographic object
             else if(m_cmdArgs.at(filePathsStart - 3) == "RC6")
-                m_walkWith.reset(new sisyph::RC6(m_cmdArgs.at(filePathsStart - 2)));
+                m_walkWith.reset(
+                    new sisyph::RC6(
+                        m_cmdArgs.at(filePathsStart - 2)
+                    )
+                );
+            // if it's AES, then allocate sisyph::AES cryptographic object
+            else if(m_cmdArgs.at(filePathsStart - 3) == "AES")
+                m_walkWith.reset(
+                    new sisyph::AES(
+                        m_cmdArgs.at(filePathsStart - 2)
+                    )
+                );
+            // if it's Serpent, then allocate sisyph::Serpent cryptographic object
+            else if(m_cmdArgs.at(filePathsStart - 3) == "SERPENT")
+                m_walkWith.reset(
+                    new sisyph::Serpent(
+                        m_cmdArgs.at(filePathsStart - 2)
+                    )
+                );
             // if nothing of these, then show usage message and exit
             else
                 usage();

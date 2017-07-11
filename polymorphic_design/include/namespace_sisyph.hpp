@@ -6,6 +6,9 @@ namespace sisyph {
     class BlockCipher;
     class Twofish;
     class RC6;
+    class AES;
+    class Serpent;
+    class MARS;
 };
 
 #endif

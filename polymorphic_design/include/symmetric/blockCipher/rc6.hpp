@@ -22,10 +22,13 @@ public:
             >::value
         >
     >
-    RC6(cipherMode&& blockCipherMode):
-            BlockCipher("", std::forward<cipherMode>(blockCipherMode),
-                            CryptoPP::RC6::MAX_KEYLENGTH,
-                            CryptoPP::RC6::BLOCKSIZE) {
+    explicit RC6(cipherMode&& blockCipherMode) noexcept:
+            BlockCipher(
+                "",
+                std::forward<cipherMode>(blockCipherMode),
+                CryptoPP::RC6::MAX_KEYLENGTH,
+                CryptoPP::RC6::BLOCKSIZE
+            ) {
     }
 
     /* perfect forwarding constructor
@@ -42,6 +45,10 @@ public:
                 filesystem::path,
                 std::decay_t<pathT>
             >::value &&
+            !std::is_base_of<
+                sisyph::RC6,
+                std::decay_t<cipherMode>
+            >::value &&
             std::is_constructible<
                 std::string,
                 std::decay_t<cipherMode>
@@ -49,10 +56,12 @@ public:
         >
     >
     explicit RC6(pathT&& fullPath, cipherMode&& blockCipherMode) noexcept:
-                BlockCipher(std::forward<pathT>(fullPath),
-                            std::forward<cipherMode>(blockCipherMode),
-                            CryptoPP::RC6::MAX_KEYLENGTH,
-                            CryptoPP::RC6::BLOCKSIZE) {
+                BlockCipher(
+                    std::forward<pathT>(fullPath),
+                    std::forward<cipherMode>(blockCipherMode),
+                    CryptoPP::RC6::MAX_KEYLENGTH,
+                    CryptoPP::RC6::BLOCKSIZE
+                ) {
     }
 
     // main implementation of encryption
@@ -67,10 +76,10 @@ public:
     // initialization vector(IV) generation method
     virtual void generateIV() override;
 
-    // getter for m_encKey. Simply returns encryption key in encoded hex format
+    // getter for m_encKey. Simply returns encryption key in hex encoded format
     virtual std::string getKey() noexcept override;
 
-    // setter for m_encKey. Sets new key from encoded hex format
+    // setter for m_encKey. Sets new key from hex encoded format
     // Then decodes it to byte format
     virtual void setKey(std::string& newKey) override;
 };

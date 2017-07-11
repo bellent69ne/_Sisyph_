@@ -1,19 +1,19 @@
-#ifndef TWOFISH_HPP
-#define TWOFISH_HPP
+#ifndef SERPENT_HPP
+#define SERPENT_HPP
 
 #include "blockCipher.hpp"
-#include "twofish.h"
+#include "serpent.h"
 
-class sisyph::Twofish: public sisyph::BlockCipher {
+class sisyph::Serpent: public sisyph::BlockCipher {
 public:
     // Default construction
-    Twofish();
+    Serpent();
 
     // perfect forwarding constructor. Forwards only block cipher mode
     template<typename cipherMode,
         typename = std::enable_if_t<
             !std::is_base_of<
-                sisyph::RC6,
+                sisyph::Serpent,
                 std::decay_t<cipherMode>
             >::value &&
             std::is_constructible<
@@ -22,23 +22,24 @@ public:
             >::value
         >
     >
-    explicit Twofish(cipherMode&& blockCipherMode):
+    explicit Serpent(cipherMode&& blockCipherMode) noexcept:
             BlockCipher(
                 "",
                 std::forward<cipherMode>(blockCipherMode),
-                CryptoPP::Twofish::MAX_KEYLENGTH,
-                CryptoPP::Twofish::BLOCKSIZE
+                CryptoPP::Serpent::MAX_KEYLENGTH,
+                CryptoPP::Serpent::BLOCKSIZE
             ) {
     }
 
-    /* perfect forwarding constructor
-       It should be straightforward. If it's not,
-       refer to template metaprogramming on your search engine.
+    /*
+        perfect forwarding constructor
+        It should be straightforward. If it's not,
+        refer to template metaprogramming on your search engine
     */
     template<typename pathT, typename cipherMode,
         typename = std::enable_if_t<
             !std::is_base_of<
-                sisyph::Twofish,
+                sisyph::Serpent,
                 std::decay_t<pathT>
             >::value &&
             std::is_constructible<
@@ -46,7 +47,7 @@ public:
                 std::decay_t<pathT>
             >::value &&
             !std::is_base_of<
-                sisyph::Twofish,
+                sisyph::Serpent,
                 std::decay_t<cipherMode>
             >::value &&
             std::is_constructible<
@@ -55,34 +56,33 @@ public:
             >::value
         >
     >
-    explicit Twofish(pathT&& fullPath, cipherMode&& blockCipherMode) noexcept:
-                BlockCipher(
-                    std::forward<pathT>(fullPath),
-                    std::forward<cipherMode>(blockCipherMode),
-                    CryptoPP::Twofish::MAX_KEYLENGTH,
-                    CryptoPP::Twofish::BLOCKSIZE
-                ) {
+    explicit Serpent(pathT&& fullPath, cipherMode&& blockCipherMode) noexcept:
+            BlockCipher(
+                std::forward<pathT>(fullPath),
+                std::forward<cipherMode>(blockCipherMode),
+                CryptoPP::Serpent::MAX_KEYLENGTH,
+                CryptoPP::Serpent::BLOCKSIZE
+            ) {
     }
 
-    // main implementation of encryption
+    // main implementationof encryption
     virtual void encrypt() override;
 
     // main implementation of decryption
     virtual void decrypt() override;
 
-    // key generation method(256 bit)
+    // key generation method(key is 256 bit)
     virtual void generateKey() override;
 
-    // initialization vector(IV) generation method
+    //initialization vector(IV) generation method
     virtual void generateIV() override;
 
-    // getter for m_encKey. Simply returns encryption key in encoded hex format
+    // getter for m_encKey. Simply returns encryption key in hex encoded format
     virtual std::string getKey() noexcept override;
 
-    // setter for m_encKey. Sets new key from encoded hex format
+    // setter for m_encKey. Sets new ket from hex encoded format
     // Then decodes it to byte format
     virtual void setKey(std::string& newKey) override;
 };
-
 
 #endif

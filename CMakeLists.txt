@@ -25,7 +25,9 @@ SET(
 	"${PROJECT_SOURCE_DIR}/polymorphic_design/src/symmetric/symmetric.cpp"
 	"${PROJECT_SOURCE_DIR}/polymorphic_design/src/symmetric/blockCipher/blockCipher.cpp"
 	"${PROJECT_SOURCE_DIR}/polymorphic_design/src/symmetric/blockCipher/rc6.cpp"
-	"${PROJECT_SOURCE_DIR}/polymorphic_design/src/symmetric/blockCipher/twofish.cpp"
+	"${PROJECT_SOURCE_DIR}/polymorphic_design/src/symmetric/blockCipher/twofish.cpp"	
+	"${PROJECT_SOURCE_DIR}/polymorphic_design/src/symmetric/blockCipher/aes.cpp"
+	"${PROJECT_SOURCE_DIR}/polymorphic_design/src/symmetric/blockCipher/serpent.cpp"
 	"${PROJECT_SOURCE_DIR}/polymorphic_design/src/shredder.cpp"
 	"${PROJECT_SOURCE_DIR}/polymorphic_design/src/walker.cpp"
 )

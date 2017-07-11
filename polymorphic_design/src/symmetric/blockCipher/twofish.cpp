@@ -2,9 +2,12 @@
 
 // Default constructed mode,
 sisyph::Twofish::Twofish():
-                        BlockCipher("", "CBC",
-                                        CryptoPP::Twofish::MAX_KEYLENGTH,
-                                        CryptoPP::Twofish::BLOCKSIZE) {
+                BlockCipher(
+                    "",
+                    "CBC",
+                    CryptoPP::Twofish::MAX_KEYLENGTH,
+                    CryptoPP::Twofish::BLOCKSIZE
+                ) {
 }
 
 // Decryption implementation
@@ -30,6 +33,7 @@ void sisyph::Twofish::encrypt() {
     if(m_blockCipherModes["CBC"])
         process<CBC_Mode<CryptoPP::Twofish>::Encryption>(true);
     // if m_blockCipherMode is ECB, process it with ECB cipher mode
+    // ECB is not recommended. Supported just optionally
     else if(m_blockCipherModes["ECB"])
         process<ECB_Mode<CryptoPP::Twofish>::Encryption>(true);
     // if m_blockCipherMode is CTR, process it with CTR cipher mode
@@ -107,7 +111,7 @@ void sisyph::Twofish::generateKey() {
 // initialization vector(IV) generation. Both hex encoded and decoded(in bytes);
 void sisyph::Twofish::generateIV() {
     // Generate initialization vector(IV)
-    generate(m_byteIV, CryptoPP::Twofish::BLOCKSIZE, m_encIV);
+    generate(m_byteIV, m_byteIV.size(), m_encIV);
 }
 
 /* Get the final key representation. It consists of hex encoded key
