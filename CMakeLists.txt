@@ -10,7 +10,9 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CLANG_COMPILER_FLAGS}")
 project(sisyph)
 
 include_directories(
-	"${PROJECT_SOURCE_DIR}/polymorphic_design/include"
+	"${PROJECT_SOURCE_DIR}/polymorphic_design/include/"
+	"${PROJECT_SOURCE_DIR}/polymorphic_design/include/symmetric"
+	"${PROJECT_SOURCE_DIR}/polymorphic_design/include/symmetric/blockCipher"
 	"/usr/include/cryptopp"
 )
 
@@ -20,10 +22,10 @@ link_directories(/usr/lib)
 SET(
 	SOURCE_FILES
 	"${PROJECT_SOURCE_DIR}/polymorphic_design/src/main.cpp"
-	"${PROJECT_SOURCE_DIR}/polymorphic_design/src/symmetric.cpp"
-	"${PROJECT_SOURCE_DIR}/polymorphic_design/src/blockCipher.cpp"
-	"${PROJECT_SOURCE_DIR}/polymorphic_design/src/rc6.cpp"
-	"${PROJECT_SOURCE_DIR}/polymorphic_design/src/twofish.cpp"
+	"${PROJECT_SOURCE_DIR}/polymorphic_design/src/symmetric/symmetric.cpp"
+	"${PROJECT_SOURCE_DIR}/polymorphic_design/src/symmetric/blockCipher/blockCipher.cpp"
+	"${PROJECT_SOURCE_DIR}/polymorphic_design/src/symmetric/blockCipher/rc6.cpp"
+	"${PROJECT_SOURCE_DIR}/polymorphic_design/src/symmetric/blockCipher/twofish.cpp"
 	"${PROJECT_SOURCE_DIR}/polymorphic_design/src/shredder.cpp"
 	"${PROJECT_SOURCE_DIR}/polymorphic_design/src/walker.cpp"
 )
